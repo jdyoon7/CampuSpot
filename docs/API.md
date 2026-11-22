@@ -1,11 +1,25 @@
-# API 계약
+# 공통 인증 API
 
-현재 실제 업무용 RPC/Edge Function은 없다. Supabase 클라이언트 진입점만 있다. 아래는 후속 구현의 기준이다.
+화면에서는 `src/shared/auth/useAuth.ts`의 `useAuth()`를 사용합니다. `state.status`는 unconfigured, loading, signed-out, error, ready 중 하나입니다. ready에만 `state.user.id`, `state.account.profile`, `roles`, `verifiedUniversityId`가 있습니다(마지막 두 필드도 account 아래). error에는 `{code,message,retryable}` 형태의 error와 재로그인에 쓸 user가 있습니다. `refresh()`로 DB 상태를 다시 읽습니다.
 
-- src/shared/lib/supabase.ts는 미설정 시 null. 담당 api 계층에서 연결 여부 확인하고 UI에 미연결 표시.
-- 읽기는 Supabase + RLS + pagination. 입력/필터 Zod 검증. 서버 권한 검증을 UI 숨김으로 대체 금지.
-- 사용자 공개 프로필/인증 정보는 공통 auth 계약 확정 후 사용. 역할을 localStorage로 부여 금지.
-- 실패 반환은 `{ code: string, message: string, retryable: boolean }`, 사용자 표시 메시지에 내부 오류/비밀/SQL 금지.
-- 모집 승인, 쿠폰 사용, 검수 승인/포인트 보상, 광고 활성화는 원자적인 RPC/서버 함수. 타임아웃 재시도에도 중복 효과 방지.
-- 공통 points/payments/chat/notifications 인터페이스는 C가 후속 PR로 문서와 함께 확정. URL/RPC/SDK를 임의로 가정하지 않는다. A/B는 필요한 entity_type/id, 동작, 요청/성공/권한/실패를 자기 README에 요청으로 기록한다.
-- 외부 연동 구현 PR에 공식 문서 URL, 확인 날짜, 지원 여부, 인증 방식, 테스트/실환경 구분을 남긴다. Groble 검증 방식 미확정 상태에서는 실제 결제 버튼 비활성화.
+```tsx
+const { state } = useAuth();
+if (state.status === 'ready') {
+  const canShowOrganizerTools = state.account.roles.includes('event_organizer');
+  // 행사 쓰기 RLS에서도 public.has_my_role('event_organizer')를 확인합니다.
+}
+```
+
+| 호출                        | 입력 → 성공                                                               | 권한 / 실패                                                                          |
+| --------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| save_my_profile             | p_nickname, p_university, p_campus, p_department, p_student_number → void | 로그인 본인. 선택 필드를 생략하면 비웁니다. 조합이 맞지 않으면 프로필 변경 전체 취소 |
+| my_verified_university      | 인수 없음 → UUID 또는 null                                                | 로그인 본인. 미인증·만료는 null                                                      |
+| has_my_role                 | p_role → boolean                                                          | 로그인 본인. verified_student는 유효한 학교 인증에서 계산                            |
+| core-account POST JSON      | action=school-email, email → sent                                         | 확인된 가입 계정. unknown_domain, rate_limited, mail_unconfigured, mail_failed       |
+| confirm_school_email        | p_code(UUID) → boolean                                                    | 요청한 본인. 만료·오입력·이미 사용·다른 계정에 연결된 주소는 false                   |
+| core-account POST image/png | PNG 본문 → saved                                                          | 현재 사용자, 최대 2MB·1024×1024. 서버가 PNG를 디코딩하고 다시 인코딩                 |
+| core-account POST JSON      | action=delete, password → deleted                                         | 로그인 사용자와 비밀번호가 확인된 계정만 탈퇴. 사진 및 계정 연관 기록 정리           |
+
+클라이언트 계정 작업은 `src/shared/auth/account.ts`에 있습니다. Edge 응답은 `{code}`이고 클라이언트가 사용자 메시지와 재시도 여부로 변환합니다. service_role 전용 issue_school_challenge는 브라우저에서 호출하지 않습니다. 프로필 사진은 비공개 core-avatars 버킷의 본인 UID/avatar.png에 저장하며 사용자 직접 쓰기는 허용하지 않습니다. 행사 포스터나 할인 증빙은 각각 별도 권한 정책을 가진 버킷이 필요합니다.
+
+현재 지원하는 역할 이름은 member, verified_student, event_organizer, business_owner, admin, super_admin입니다. 북마크, 포인트, 결제, 채팅, 알림 API는 후속 PR에서 추가합니다.

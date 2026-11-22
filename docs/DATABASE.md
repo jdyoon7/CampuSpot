@@ -1,17 +1,23 @@
-# DB 계약 및 적용 순서
+# 공통 회원·학교 스키마
 
-현재 실제 테이블/migration/RLS는 생성하지 않았다. supabase/config.toml은 로컬 CLI 설정이다. 아래는 구현 계약이며 완료된 스키마가 아니다.
+기준 파일은 `supabase/migrations/20261122161428_core_identity.sql`입니다. A/B는 이 migration 다음에 자기 테이블을 추가하고 사용자 FK에 `public.profiles(id)`, 학교 FK에 `public.universities(id)`를 사용하세요. 사용자 삭제 시 참가·행사 자료를 어떻게 보존할지는 각 기능 migration에서 결정합니다.
 
-1. C: universities/campuses/departments/profiles/user_roles/university_verifications. auth.users 연동, 공개/비공개 프로필 분리, 안전한 가입 트리거. 일반 회원이 roles/verification 상태 수정 불가.
-2. A: group_categories/groups/group_members/group_applications/group_conditions/matches/match_applications/match_results/group_reviews.
-3. B: events/event_categories/event_applications/event_reviews/event_reports/event_questions/event_answers/places/place_categories/place_facilities/place_images/place_reviews/place_reports/clubs/club_members.
-4. C: businesses/business_owners/business_verifications/discounts/discount_reports/business_partnerships/coupons/user_coupons/coupon_redemptions.
-5. C 공통 후속: 원본 기획의 community/points/chat/payments/notifications/collection 테이블. B는 행사 검수 화면/수집 로직을 소유하지만 공통 검수 테이블 중복 생성 금지.
+| 테이블                       | 주요 열과 관계                                                | 클라이언트 권한                                      |
+| ---------------------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
+| universities                 | id, name                                                      | 누구나 조회                                          |
+| campuses                     | id, university_id, name                                       | 누구나 조회                                          |
+| departments                  | id, campus_id, name                                           | 누구나 조회                                          |
+| university_email_domains     | domain → university_id                                        | 누구나 조회, 운영자가 확인한 학생 전용 도메인만 등록 |
+| profiles                     | id = auth.users.id, nickname                                  | 로그인 회원이 닉네임 조회                            |
+| private_profiles             | id, university_id, campus_id, department_id, student_number   | 본인만 조회, 본인 RPC로 수정                         |
+| user_roles                   | (user_id, role)                                               | 본인만 조회, 서버에서만 부여                         |
+| university_verifications     | user_id, university_id, school_email, verified_at, expires_at | 본인만 조회, 인증 RPC에서 기록                       |
+| core_private.mail_challenges | user_id, school_email, university_id, digest, issued_at       | 비공개                                               |
 
-모든 public 테이블에 RLS, 필요한 FK 인덱스 및 CHECK/UNIQUE. RLS는 anon/authenticated/소유자/타인/허용 역할/관리자별 SELECT/INSERT/UPDATE/DELETE 검증. 공개된 데이터에 한해 anon SELECT. 인증 상태만으로 관리자 권한을 부여하지 않는다.
+공개 스키마 테이블은 RLS를 적용하며 created_at/updated_at을 기록합니다. 가입 트리거와 기존 계정 보충 작업이 프로필 두 행과 member 역할을 생성합니다. 가입 메타데이터에서 권한을 복사하지 않습니다. 학교·캠퍼스·학과의 조합은 FK로 검증합니다. 기초 목록에는 테스트 학교를 넣지 않았습니다.
 
-모집 승인 정원은 행 잠금 및 트랜잭션으로 동시 초과 방지. 재신청/중복 참가의 UNIQUE 설계. 쿠폰 사용은 서버 시각/매장 권한/잔여 수량/기한 검사 후 일회성 코드 검증 및 원자적 사용 처리. 포인트 지급/차감은 원장과 잔액을 동일 트랜잭션으로 갱신하고 idempotency key UNIQUE.
+본인이 입력한 학교는 추천에 사용할 수 있습니다. **학교 한정 데이터 접근**은 RLS에서 `university_id = (select public.my_verified_university())`로 검사하세요. 인증된 학교는 인증 메일을 받은 학교 도메인으로 결정합니다. 별도 권한이 필요한 경우 `(select public.has_my_role('event_organizer'))`와 행 소유자 조건을 함께 사용합니다. 관리자 포함 모든 추가 역할은 명시적으로 부여합니다.
 
-로컬 개발: Docker Desktop 실행 → `npm ci` → `npm run db:start` → `npm run db:reset`. reset은 로컬 데이터 삭제 명령이므로 개발 fixture만 둔다. 운영/공유 원격 reset 금지. `npm run db:types`는 C만 생성/커밋(현재 generated 파일 없음). migration 생성은 `npx supabase migration new groups_create_groups` 등. 병합 전 깨끗한 로컬 DB에 전체 migration 재적용하고 `npm run db:test`로 실제 pgTAP 테스트 실행. 아직 DB 테스트 파일이 없으므로 통과로 보고하지 않는다.
+학교 인증은 10분짜리 일회성 코드와 1분 재발송 제한을 두며 DB는 코드의 SHA-256만 보관합니다. 인증 유효기간은 초기값 180일입니다. 메일함 소유만으로 재학생 자격을 확인할 수 없는 도메인은 등록 대상에서 제외하고 별도 심사 정책을 먼저 정하세요. 인증 철회는 운영자가 해당 verification을 제거합니다.
 
-공통 API/컬럼 확정 시 이 문서를 실제 스키마로 갱신하고 마이그레이션/롤백 전략 기록. 파괴적 변경은 expand/migrate/contract 순서로 데이터 보존 계획 필요.
+로컬 적용·검증 절차는 [계정 개발 안내](../src/features/auth/README.md)에 있습니다. 공유 DB 적용 전 백업 및 신규 가입 트리거 동작을 검증하세요. 되돌릴 때는 앱 변경을 revert하고 데이터는 보존합니다. 기능 철회가 필요하면 새 migration으로 실행 권한·트리거부터 조정하고 기존 프로필 테이블 삭제는 별도 데이터 보존 계획을 세운 뒤 진행하세요.

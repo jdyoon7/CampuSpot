@@ -1,3 +1,4 @@
+import { AccountPage } from '../features/auth/AccountPage';
 import { NavLink, Route, Routes } from 'react-router-dom';
 import {
   House,
@@ -48,15 +49,8 @@ export function App() {
           {groupsRoutes}
           {eventsRoutes}
           {discountsRoutes}
-          <Route
-            path="/me"
-            element={
-              <ModuleStatus
-                title="마이페이지"
-                description="인증과 프로필은 공통 기반 단계에서 연결합니다."
-              />
-            }
-          />
+          <Route path="/me" element={<AccountPage />} />
+          <Route path="/me/reset" element={<AccountPage />} />
           <Route path="*" element={<h1>페이지를 찾을 수 없습니다.</h1>} />
         </Routes>
       </main>
