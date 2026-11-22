@@ -42,6 +42,26 @@ test('일반 이메일 가입, 세션 복원, 프로필, 복구, 비밀번호 �
     await expect(
       page.getByRole('heading', { name: '테스트 회원' }),
     ).toBeVisible();
+    const photo = page.locator('input[name=avatar]');
+    await photo.setInputFiles({
+      name: 'invalid.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from('invalid'),
+    });
+    await page.getByRole('button', { name: '사진 저장' }).click();
+    await expect(page.getByRole('alert')).toContainText('PNG');
+    await photo.setInputFiles({
+      name: 'pixel.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=',
+        'base64',
+      ),
+    });
+    await page.getByRole('button', { name: '사진 저장' }).click();
+    await expect(
+      page.getByRole('img', { name: '내 프로필 사진' }),
+    ).toBeVisible();
     await page.getByRole('button', { name: '로그아웃' }).click();
     await expect(page.getByLabel('비밀번호', { exact: true })).toBeVisible();
     const recovery = await admin.auth.admin.generateLink({
