@@ -1,0 +1,159 @@
+.events-page {
+  display: grid;
+  gap: 20px;
+}
+
+.events-header h1,
+.events-results-heading h2,
+.event-detail h2 {
+  margin: 0;
+}
+
+.events-header p {
+  margin: 6px 0 0;
+  color: #64746a;
+}
+
+.events-eyebrow {
+  color: #16784b !important;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.events-connection,
+.events-state,
+.event-detail,
+.events-filters,
+.event-card {
+  border: 1px solid #dce7df;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.events-connection {
+  display: grid;
+  gap: 5px;
+  padding: 14px 16px;
+  color: #405448;
+}
+
+.events-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 16px;
+}
+
+.events-filters label {
+  display: grid;
+  gap: 6px;
+  color: #42564a;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.events-filters input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #cbd9cf;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: inherit;
+  font: inherit;
+}
+
+.events-page button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 14px;
+  background: #16784b;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.events-page button:disabled {
+  background: #87978d;
+  cursor: not-allowed;
+}
+
+.events-results {
+  display: grid;
+  gap: 10px;
+}
+
+.events-results-heading,
+.event-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.events-results-heading h2 {
+  font-size: 1.1rem;
+}
+
+.event-card {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  padding: 15px;
+  color: #263c2e !important;
+  text-align: left;
+}
+
+.event-card-meta {
+  justify-content: flex-start;
+  color: #16784b;
+  font-size: 0.8rem;
+}
+
+.events-state {
+  margin: 0;
+  padding: 18px;
+  color: #52645a;
+}
+
+.events-error {
+  border-color: #e7b9b5;
+  color: #8b2d27;
+}
+
+.events-error p {
+  margin: 0;
+}
+
+.event-detail {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.event-detail p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.events-page .events-back {
+  justify-self: start;
+  padding-inline: 0;
+  background: transparent;
+  color: #16784b;
+}
+
+@media (max-width: 640px) {
+  .events-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .events-filters label:first-child,
+  .events-filters button {
+    grid-column: 1 / -1;
+  }
+}
