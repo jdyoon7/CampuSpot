@@ -75,6 +75,54 @@ export type Database = {
           },
         ]
       }
+      discount_reports: {
+        Row: {
+          created_at: string
+          details: string
+          ends_on: string | null
+          id: string
+          reporter_id: string
+          source_url: string
+          starts_on: string | null
+          status: Database["public"]["Enums"]["discount_report_status"]
+          store_name: string
+          updated_at: string
+        }
+        ComputedFields: never
+        Insert: {
+          created_at?: string
+          details: string
+          ends_on?: string | null
+          id?: string
+          reporter_id: string
+          source_url: string
+          starts_on?: string | null
+          status?: Database["public"]["Enums"]["discount_report_status"]
+          store_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          ends_on?: string | null
+          id?: string
+          reporter_id?: string
+          source_url?: string
+          starts_on?: string | null
+          status?: Database["public"]["Enums"]["discount_report_status"]
+          store_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       private_profiles: {
         Row: {
           campus_id: string | null
@@ -322,6 +370,7 @@ export type Database = {
         | "business_owner"
         | "admin"
         | "super_admin"
+      discount_report_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -457,6 +506,7 @@ export const Constants = {
         "admin",
         "super_admin",
       ],
+      discount_report_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

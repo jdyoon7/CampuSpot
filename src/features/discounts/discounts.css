@@ -1,0 +1,107 @@
+.discounts-page {
+  max-width: 42rem;
+  margin-inline: auto;
+  color-scheme: light dark;
+}
+.discounts-page header {
+  margin-bottom: 1.25rem;
+}
+.discounts-page h1,
+.discounts-page h2,
+.discount-form > fieldset > legend {
+  font-weight: 700;
+}
+.discount-form,
+.discount-history,
+.discount-notice {
+  padding: clamp(1rem, 4vw, 1.6rem);
+  border: 1px solid #83978a;
+  border-radius: 0.8rem;
+  background: Canvas;
+  color: CanvasText;
+  margin-block: 1rem;
+}
+.discount-form > fieldset {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.discount-form > fieldset > legend,
+.discount-history h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+.discount-form label {
+  display: grid;
+  gap: 0.35rem;
+}
+.discount-form :is(input:not([type='radio']), textarea),
+.discounts-page button {
+  border: 1px solid #7a8e80;
+  border-radius: 0.45rem;
+  padding: 0.55rem 0.7rem;
+  min-height: 44px;
+}
+.discount-form :is(input:not([type='radio']), textarea) {
+  width: 100%;
+  min-width: 0;
+  background: Canvas;
+  color: CanvasText;
+}
+.discount-form small {
+  margin-top: -0.7rem;
+}
+.discount-form button[type='submit'] {
+  background: #195c36;
+  color: #fff;
+  border-color: transparent;
+  font-weight: 650;
+}
+.discounts-page :disabled {
+  opacity: 0.65;
+}
+.discount-period label,
+.discount-pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+  min-height: 44px;
+}
+.discount-dates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  gap: 0.8rem;
+}
+.discount-notice a,
+.discount-history a {
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+.discount-history li {
+  padding-block: 1rem;
+  border-top: 1px solid #829b8a75;
+  overflow-wrap: anywhere;
+}
+.discount-history li p {
+  white-space: pre-wrap;
+  margin: 0.4rem 0;
+}
+.discount-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.discount-meta span {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.discount-history a {
+  display: block;
+  margin-top: 0.5rem;
+}
+.discount-form [role='alert'],
+.discount-form [role='status'] {
+  margin-top: 1rem;
+}
