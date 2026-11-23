@@ -105,3 +105,36 @@
 .discount-form [role='status'] {
   margin-top: 1rem;
 }
+.discount-review-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+}
+.discount-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.discount-approve {
+  background: #195c36;
+  color: #fff;
+}
+.discount-review-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+.discount-review-form textarea {
+  min-height: 5rem;
+  border: 1px solid #7a8e80;
+  border-radius: 0.45rem;
+  padding: 0.6rem;
+  background: Canvas;
+  color: CanvasText;
+}
+.discount-review-reason {
+  border-inline-start: 3px solid #9a6a22;
+  padding-inline-start: 0.6rem;
+}

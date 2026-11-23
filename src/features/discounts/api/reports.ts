@@ -54,13 +54,13 @@ export async function submitReport(userId: string, input: ReportInput) {
     });
   if (error) throw reportError(error.code);
 }
-const pageSize = 20;
+export const pageSize = 20;
 export async function listReports(userId: string, page: number) {
   const start = page * pageSize;
   const { data, error } = await client()
     .from('discount_reports')
     .select(
-      'id,store_name,details,source_url,starts_on,ends_on,status,created_at',
+      'id,store_name,details,source_url,starts_on,ends_on,status,created_at,rejection_reason',
     )
     .eq('reporter_id', userId)
     .order('created_at', { ascending: false })
