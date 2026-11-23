@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../shared/auth/useAuth';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
+import { canReview, loadPublished } from './api/review';
+import { ReportList } from './components/ReportList';
+import { OfferDetails } from './components/OfferDetails';
+import { formatKoreanDate } from '../../shared/lib/date';
 import './discounts.css';
 
 export default function DiscountsPage() {
@@ -32,6 +36,26 @@ export default function DiscountsPage() {
         <div role="alert">
           {state.error.message} <button onClick={refresh}>다시 불러오기</button>
         </div>
+      )}
+      {state.status === 'ready' && canReview(state.account.roles) && (
+        <Link className="discount-review-link" to="/discounts/review">
+          제보 검수하기
+        </Link>
+      )}
+      {state.status !== 'unconfigured' && (
+        <ReportList
+          title="공개 혜택"
+          empty="아직 공개된 혜택이 없습니다."
+          load={loadPublished}
+        >
+          {(offer) => (
+            <>
+              <strong>{offer.store_name}</strong>
+              <OfferDetails offer={offer} />
+              <small>{formatKoreanDate(offer.verified_at)} 검수</small>
+            </>
+          )}
+        </ReportList>
       )}
       <ReportForm
         key={userId ?? 'guest'}

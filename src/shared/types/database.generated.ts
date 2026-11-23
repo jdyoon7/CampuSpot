@@ -81,7 +81,9 @@ export type Database = {
           details: string
           ends_on: string | null
           id: string
+          rejection_reason: string | null
           reporter_id: string
+          reviewed_at: string | null
           source_url: string
           starts_on: string | null
           status: Database["public"]["Enums"]["discount_report_status"]
@@ -94,7 +96,9 @@ export type Database = {
           details: string
           ends_on?: string | null
           id?: string
+          rejection_reason?: string | null
           reporter_id: string
+          reviewed_at?: string | null
           source_url: string
           starts_on?: string | null
           status?: Database["public"]["Enums"]["discount_report_status"]
@@ -106,7 +110,9 @@ export type Database = {
           details?: string
           ends_on?: string | null
           id?: string
+          rejection_reason?: string | null
           reporter_id?: string
+          reviewed_at?: string | null
           source_url?: string
           starts_on?: string | null
           status?: Database["public"]["Enums"]["discount_report_status"]
@@ -347,9 +353,29 @@ export type Database = {
         Args: { p_digest: string; p_email: string; p_user: string }
         Returns: string
       }
+      list_published_discounts: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          details: string
+          ends_on: string
+          id: string
+          source_url: string
+          starts_on: string
+          store_name: string
+          verified_at: string
+        }[]
+      }
       my_verified_university: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      review_discount_report: {
+        Args: {
+          p_decision: Database["public"]["Enums"]["discount_report_status"]
+          p_reason?: string
+          p_report_id: string
+        }
+        Returns: undefined
       }
       save_my_profile: {
         Args: {
