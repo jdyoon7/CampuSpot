@@ -387,6 +387,24 @@ export type Database = {
         }
         Returns: undefined
       }
+      search_published_discounts: {
+        Args: {
+          p_ending_soon?: boolean
+          p_limit?: number
+          p_offset?: number
+          p_query?: string
+          p_today_only?: boolean
+        }
+        Returns: {
+          details: string
+          ends_on: string
+          id: string
+          source_url: string
+          starts_on: string
+          store_name: string
+          verified_at: string
+        }[]
+      }
     }
     Enums: {
       app_role:

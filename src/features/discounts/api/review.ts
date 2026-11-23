@@ -8,20 +8,6 @@ export function canReview(roles: Role[]) {
   return roles.includes('admin') || roles.includes('super_admin');
 }
 
-export async function loadPublished(page: number) {
-  const { data, error } = await client().rpc('list_published_discounts', {
-    p_offset: page * pageSize,
-    p_limit: pageSize + 1,
-  });
-  if (error)
-    throw new AccountError(
-      'list_failed',
-      '공개 혜택을 불러오지 못했습니다.',
-      true,
-    );
-  return { items: data.slice(0, pageSize), hasNext: data.length > pageSize };
-}
-
 export async function loadQueue(userId: string, page: number) {
   const offset = page * pageSize;
   const { data, error } = await client()
