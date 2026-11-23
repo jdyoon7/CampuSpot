@@ -34,6 +34,7 @@ export interface EventFilters {
   campusQuery?: string;
   startDate?: string;
   endDate?: string;
+  category?: EventCategory;
 }
 
 export type EventListResult =
@@ -54,6 +55,9 @@ export type EventDetailResult =
 
 export type EventListState =
   'loading' | 'error' | 'unavailable' | 'empty' | 'ready';
+
+export type EventDetailState =
+  'loading' | 'error' | 'unavailable' | 'not_found' | 'ready';
 
 export interface EventService {
   listEvents(filters?: EventFilters): Promise<EventListResult>;

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { campusEvents } from '../../../tests/fixtures/events/events';
 import {
   eventService,
+  getEventDetailState,
   filterEvents,
   getEventListState,
   validateEventDateRange,
@@ -49,6 +50,12 @@ describe('event filtering', () => {
       filterEvents(verifiedFixtures, { campusQuery: '없는 학교' }),
     ).toEqual([]);
   });
+
+  test('filters events by category', () => {
+    expect(filterEvents(verifiedFixtures, { category: 'festival' })).toEqual([
+      verifiedFixtures[0],
+    ]);
+  });
 });
 
 describe('event service connection state', () => {
@@ -91,5 +98,23 @@ describe('event service connection state', () => {
         events: [],
       }),
     ).toBe('loading');
+  });
+
+  test('distinguishes loading, failure, missing, unavailable, and ready details', () => {
+    const base = {
+      loading: false,
+      error: null,
+      unavailable: false,
+      event: null,
+    };
+    expect(getEventDetailState({ ...base, loading: true })).toBe('loading');
+    expect(getEventDetailState({ ...base, error: 'failed' })).toBe('error');
+    expect(getEventDetailState({ ...base, unavailable: true })).toBe(
+      'unavailable',
+    );
+    expect(getEventDetailState(base)).toBe('not_found');
+    expect(getEventDetailState({ ...base, event: verifiedFixtures[0] })).toBe(
+      'ready',
+    );
   });
 });
