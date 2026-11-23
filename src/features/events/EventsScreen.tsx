@@ -1,6 +1,19 @@
-import { useEffect, useState } from 'react';
-import { eventService, getEventListState } from './services/eventService';
-import type { CampusEvent, EventFilters } from './types';
+import { useEffect, useState, type FormEvent } from 'react';
+import {
+  eventService,
+  getEventDetailState,
+  getEventListState,
+  validateEventDateRange,
+} from './services/eventService';
+import type { CampusEvent, EventCategory, EventFilters } from './types';
+
+const categories: { value: EventCategory | ''; label: string }[] = [
+  { value: '', label: '전체 유형' },
+  { value: 'festival', label: '축제' },
+  { value: 'club', label: '동아리' },
+  { value: 'mt', label: 'MT' },
+  { value: 'other', label: '기타 행사' },
+];
 
 function formatEventTime(value: string): string {
   return new Intl.DateTimeFormat('ko-KR', {
@@ -15,10 +28,9 @@ function formatEventTime(value: string): string {
 }
 
 function categoryLabel(event: CampusEvent): string {
-  if (event.category === 'festival') return '축제';
-  if (event.category === 'club') return '동아리';
-  if (event.category === 'mt') return 'MT';
-  return '행사';
+  return (
+    categories.find(({ value }) => value === event.category)?.label ?? '행사'
+  );
 }
 
 export function EventsScreen() {
@@ -27,8 +39,14 @@ export function EventsScreen() {
   const [campusQuery, setCampusQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [category, setCategory] = useState<EventCategory | ''>('');
+  const [filterError, setFilterError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<CampusEvent | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [detailUnavailable, setDetailUnavailable] = useState(false);
+  const [detailAttempt, setDetailAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
@@ -65,32 +83,68 @@ export function EventsScreen() {
       return;
     }
     let active = true;
+    setDetail(null);
+    setDetailLoading(true);
+    setDetailError(null);
+    setDetailUnavailable(false);
     void eventService
       .getEvent(selectedId)
       .then((result) => {
         if (!active) return;
         setDetail(result.event);
-        if (result.status === 'unavailable') setUnavailable(true);
+        setDetailUnavailable(result.status === 'unavailable');
       })
       .catch(() => {
         if (active)
-          setError('행사 정보를 불러오지 못했습니다. 다시 시도해 주세요.');
+          setDetailError(
+            '행사 정보를 불러오지 못했습니다. 다시 시도해 주세요.',
+          );
+      })
+      .finally(() => {
+        if (active) setDetailLoading(false);
       });
     return () => {
       active = false;
     };
-  }, [selectedId]);
+  }, [selectedId, detailAttempt]);
 
-  function applyFilters() {
+  function applyFilters(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const validationError = validateEventDateRange(
+      startDate || undefined,
+      endDate || undefined,
+    );
+    if (validationError) {
+      setFilterError(validationError);
+      return;
+    }
+    setFilterError(null);
     setSelectedId(null);
     setFilters({
       campusQuery: campusQuery.trim() || undefined,
-      startDate: startDate.trim() || undefined,
-      endDate: endDate.trim() || undefined,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      category: category || undefined,
     });
   }
 
+  function clearFilters() {
+    setCampusQuery('');
+    setStartDate('');
+    setEndDate('');
+    setCategory('');
+    setFilterError(null);
+    setSelectedId(null);
+    setFilters({});
+  }
+
   const listState = getEventListState({ loading, error, unavailable, events });
+  const detailState = getEventDetailState({
+    loading: detailLoading,
+    error: detailError,
+    unavailable: detailUnavailable,
+    event: detail,
+  });
 
   return (
     <section className="events-page" aria-labelledby="events-title">
@@ -104,12 +158,16 @@ export function EventsScreen() {
         <strong>행사 데이터 미연동</strong>
         <span>
           {unavailable
-            ? 'Supabase 행사 테이블과 공통 인증·학교 기반이 준비되면 실제 정보를 표시합니다.'
-            : '표시되는 행사 정보는 검수 후 공개됩니다.'}
+            ? 'Supabase 행사 테이블이 준비되면 검수된 실제 정보를 표시합니다.'
+            : '행사 정보는 출처와 검수 상태를 확인한 뒤 공개합니다.'}
         </span>
       </div>
 
-      <div className="events-filters" aria-label="행사 검색 조건">
+      <form
+        className="events-filters"
+        aria-label="행사 검색 조건"
+        onSubmit={applyFilters}
+      >
         <label>
           학교 이름
           <input
@@ -121,7 +179,7 @@ export function EventsScreen() {
         <label>
           시작일
           <input
-            aria-label="시작일 YYYY-MM-DD"
+            aria-label="시작일"
             type="date"
             value={startDate}
             onChange={(event) => setStartDate(event.target.value)}
@@ -130,19 +188,46 @@ export function EventsScreen() {
         <label>
           종료일
           <input
-            aria-label="종료일 YYYY-MM-DD"
+            aria-label="종료일"
             type="date"
             value={endDate}
             onChange={(event) => setEndDate(event.target.value)}
           />
         </label>
-        <button type="button" onClick={applyFilters}>
-          행사 검색
-        </button>
-      </div>
+        <label>
+          행사 유형
+          <select
+            value={category}
+            onChange={(event) =>
+              setCategory(event.target.value as EventCategory | '')
+            }
+          >
+            {categories.map((item) => (
+              <option key={item.value || 'all'} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="events-filter-actions">
+          <button type="submit">행사 검색</button>
+          <button type="button" className="events-reset" onClick={clearFilters}>
+            조건 초기화
+          </button>
+        </div>
+        {filterError && (
+          <p className="events-filter-error" role="alert">
+            {filterError}
+          </p>
+        )}
+      </form>
 
-      {selectedId && detail ? (
-        <article className="event-detail">
+      {selectedId ? (
+        <section
+          className="event-detail"
+          aria-label="행사 상세"
+          aria-live="polite"
+        >
           <button
             type="button"
             className="events-back"
@@ -150,45 +235,73 @@ export function EventsScreen() {
           >
             ← 목록
           </button>
-          <div className="event-card-meta">
-            <span>{categoryLabel(detail)}</span>
-            <span>{detail.campusName}</span>
-          </div>
-          <h2>{detail.title}</h2>
-          <p>
-            {formatEventTime(detail.startsAt)} –{' '}
-            {formatEventTime(detail.endsAt)}
-          </p>
-          <p>
-            {detail.location.name}
-            {detail.location.address ? ` · ${detail.location.address}` : ''}
-          </p>
-          <p>{detail.description}</p>
-          {detail.applicationMethod && (
-            <p>
-              <strong>신청 방법</strong>
-              <br />
-              {detail.applicationMethod}
+          {detailState === 'loading' && (
+            <p role="status">행사 상세를 불러오는 중입니다…</p>
+          )}
+          {detailState === 'error' && (
+            <div className="events-state events-error" role="alert">
+              <p>{detailError}</p>
+              <button
+                type="button"
+                onClick={() => setDetailAttempt((value) => value + 1)}
+              >
+                다시 시도
+              </button>
+            </div>
+          )}
+          {detailState === 'unavailable' && (
+            <p className="events-state" role="status">
+              행사 상세 데이터가 아직 연결되지 않았습니다.
             </p>
           )}
-          {detail.participationConditions.length > 0 && (
-            <p>
-              <strong>참가 조건</strong>
-              <br />
-              {detail.participationConditions.join(' · ')}
+          {detailState === 'not_found' && (
+            <p className="events-state" role="status">
+              요청한 행사를 찾을 수 없습니다.
             </p>
           )}
-          {detail.contact && (
-            <p>
-              <strong>문의</strong>
-              <br />
-              {detail.contact}
-            </p>
+          {detailState === 'ready' && detail && (
+            <>
+              <div className="event-card-meta">
+                <span>{categoryLabel(detail)}</span>
+                <span>{detail.campusName}</span>
+              </div>
+              <h2>{detail.title}</h2>
+              <p>
+                {formatEventTime(detail.startsAt)} –{' '}
+                {formatEventTime(detail.endsAt)}
+              </p>
+              <p>
+                {detail.location.name}
+                {detail.location.address ? ` · ${detail.location.address}` : ''}
+              </p>
+              <p>{detail.description}</p>
+              {detail.applicationMethod && (
+                <p>
+                  <strong>신청 방법</strong>
+                  <br />
+                  {detail.applicationMethod}
+                </p>
+              )}
+              {detail.participationConditions.length > 0 && (
+                <p>
+                  <strong>참가 조건</strong>
+                  <br />
+                  {detail.participationConditions.join(' · ')}
+                </p>
+              )}
+              {detail.contact && (
+                <p>
+                  <strong>문의</strong>
+                  <br />
+                  {detail.contact}
+                </p>
+              )}
+              <button type="button" disabled aria-disabled="true">
+                관심 행사 저장 · 미연동
+              </button>
+            </>
           )}
-          <button type="button" disabled aria-disabled="true">
-            관심 행사 저장 · 미연동
-          </button>
-        </article>
+        </section>
       ) : (
         <section
           className="events-results"
@@ -205,10 +318,7 @@ export function EventsScreen() {
           {listState === 'error' && (
             <div className="events-state events-error" role="alert">
               <p>{error}</p>
-              <button
-                type="button"
-                onClick={() => setAttempt((value) => value + 1)}
-              >
+              <button type="button" onClick={() => setAttempt((v) => v + 1)}>
                 다시 시도
               </button>
             </div>

@@ -2,6 +2,7 @@ import { supabase } from '../../../shared/lib/supabase';
 import type {
   CampusEvent,
   EventDetailResult,
+  EventDetailState,
   EventFilters,
   EventListResult,
   EventListState,
@@ -45,7 +46,7 @@ export function filterEvents(
   events: CampusEvent[],
   filters: EventFilters = {},
 ): CampusEvent[] {
-  const { campusQuery, startDate, endDate } = filters;
+  const { campusQuery, startDate, endDate, category } = filters;
   const validationError = validateEventDateRange(startDate, endDate);
   if (validationError) throw new Error(validationError);
 
@@ -63,6 +64,7 @@ export function filterEvents(
       (event) =>
         !query || event.campusName.toLocaleLowerCase('ko-KR').includes(query),
     )
+    .filter((event) => !category || event.category === category)
     .filter((event) => {
       const eventStart = new Date(event.startsAt).getTime();
       const eventEnd = new Date(event.endsAt).getTime();
@@ -86,6 +88,18 @@ export function getEventListState(input: {
   return input.events.length === 0 ? 'empty' : 'ready';
 }
 
+export function getEventDetailState(input: {
+  loading: boolean;
+  error: string | null;
+  unavailable: boolean;
+  event: CampusEvent | null;
+}): EventDetailState {
+  if (input.loading) return 'loading';
+  if (input.error) return 'error';
+  if (input.unavailable) return 'unavailable';
+  return input.event ? 'ready' : 'not_found';
+}
+
 function unavailableReason():
   'supabase_not_configured' | 'events_schema_not_ready' {
   return supabase ? 'events_schema_not_ready' : 'supabase_not_configured';
@@ -99,7 +113,7 @@ export const eventService: EventService = {
     );
     if (validationError) throw new Error(validationError);
 
-    // Event migrations and the shared auth/school contract are not present yet.
+    // Event migrations are not present yet.
     // Never fall back to fixture/demo records in a service used by the UI.
     return { status: 'unavailable', reason: unavailableReason(), events: [] };
   },
