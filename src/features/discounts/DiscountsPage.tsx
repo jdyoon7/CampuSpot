@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../shared/auth/useAuth';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
-import { canReview, loadPublished } from './api/review';
-import { ReportList } from './components/ReportList';
-import { OfferDetails } from './components/OfferDetails';
-import { formatKoreanDate } from '../../shared/lib/date';
+import { canReview } from './api/review';
+import { PublishedOffers } from './components/PublishedOffers';
 import './discounts.css';
 
 export default function DiscountsPage() {
@@ -42,21 +40,7 @@ export default function DiscountsPage() {
           제보 검수하기
         </Link>
       )}
-      {state.status !== 'unconfigured' && (
-        <ReportList
-          title="공개 혜택"
-          empty="아직 공개된 혜택이 없습니다."
-          load={loadPublished}
-        >
-          {(offer) => (
-            <>
-              <strong>{offer.store_name}</strong>
-              <OfferDetails offer={offer} />
-              <small>{formatKoreanDate(offer.verified_at)} 검수</small>
-            </>
-          )}
-        </ReportList>
-      )}
+      {state.status !== 'unconfigured' && <PublishedOffers />}
       <ReportForm
         key={userId ?? 'guest'}
         userId={userId}
