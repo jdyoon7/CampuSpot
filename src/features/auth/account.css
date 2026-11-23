@@ -1,0 +1,59 @@
+.account {
+  max-width: 36rem;
+  margin: auto;
+}
+.account section,
+.account details,
+.account > form {
+  background: Canvas;
+  color: CanvasText;
+  border: 1px solid #829b8a;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+  color-scheme: light dark;
+}
+.account fieldset,
+.account label {
+  display: grid;
+  gap: 0.4rem;
+}
+.account fieldset {
+  gap: 0.9rem;
+  margin: 0.8rem 0;
+}
+.account input:not([type='checkbox']),
+.account select,
+.account button {
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #798d80;
+  border-radius: 0.5rem;
+  max-width: 100%;
+}
+.account button {
+  cursor: pointer;
+  font-weight: 600;
+}
+.account button[type='submit'],
+.account button[aria-pressed='true'] {
+  background: #195c36;
+  color: white;
+}
+.account .account-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.account h2 {
+  font-size: 1.25rem;
+  font-weight: 650;
+  margin-bottom: 0.5rem;
+}
+.account label:has(input[type='checkbox']) {
+  display: flex;
+  align-items: center;
+}
+.account [role='alert'] {
+  color: light-dark(#942b26, #ffbdbb);
+}

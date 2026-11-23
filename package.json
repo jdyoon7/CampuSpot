@@ -22,7 +22,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
-    "db:types": "supabase gen types typescript --local > src/shared/types/database.generated.ts"
+    "db:types": "supabase gen types typescript --local > src/shared/types/database.generated.ts",
+    "test:account": "playwright test -c playwright.account.config.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",

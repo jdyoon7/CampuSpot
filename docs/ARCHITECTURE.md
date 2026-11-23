@@ -6,4 +6,4 @@ src/features/{groups,events,discounts}/routes.tsx가 사전 연결되어 세 사
 
 서버 비밀키/결제 검증/포인트 거래는 Edge Functions 또는 PostgreSQL 트랜잭션. 장시간 Python/Playwright 수집은 별도 worker로 두고 정규화/검수 후 DB에 저장. 미확인 AI 추출 데이터를 자동 공개하지 않는다.
 
-공통 auth/context 및 DB 스키마는 후속 core PR에서 구현한다. 이 scaffold에 인증 보호가 이미 있다고 가정하지 않는다. 실제 비공개 데이터 UI는 RLS 검증이 통과되기 전 활성화 금지.
+공통 인증은 앱 루트의 AuthProvider에서 구독하고 각 영역에서 useAuth()로 읽습니다. 권한은 각 API의 RLS가 최종 검사합니다. 학교·프로필 테이블과 RPC 계약은 DATABASE.md와 API.md를 참조하세요.

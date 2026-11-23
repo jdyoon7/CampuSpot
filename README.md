@@ -5,7 +5,7 @@
 ## 현재 준비된 것
 
 React + TypeScript + Vite + Tailwind + Lucide, 5개 메뉴, 기능별 라우트 경계, Supabase 연결 진입점, ESLint/Prettier/Vitest/Playwright, GitHub Actions, 에디터 설정과 협업 문서.
-현재 화면은 개발 시작 안내입니다. 회원가입/DB/실제 행사·할인/쿠폰/결제/PWA는 아직 구현되지 않았습니다.
+마이페이지에서 이메일 가입·로그인·복구, 프로필 관리와 학교 인증을 이용합니다. 개발용 Supabase 연결은 [계정 개발 안내](src/features/auth/README.md)를 따르세요. 실제 행사·할인 데이터, 쿠폰·결제·PWA는 후속 단계입니다.
 
 ## 시작
 
