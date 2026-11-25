@@ -353,6 +353,18 @@ export type Database = {
         Args: { p_digest: string; p_email: string; p_user: string }
         Returns: string
       }
+      list_discount_calendar: {
+        Args: { p_day: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          details: string
+          ends_on: string
+          id: string
+          source_url: string
+          starts_on: string
+          store_name: string
+          verified_at: string
+        }[]
+      }
       list_published_discounts: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
