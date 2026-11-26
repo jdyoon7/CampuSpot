@@ -71,10 +71,12 @@ export default function DiscountsPage() {
         userId={userId}
         onSaved={() => setRevision((v) => v + 1)}
       />
-      {userId && <MyReports key={userId + '-' + revision} userId={userId} />}
+      {userId && (
+        <MyReports key={`reports-${userId}-${revision}`} userId={userId} />
+      )}
       {userId && (
         <MyCorrections
-          key={userId + '-' + correctionRevision}
+          key={`corrections-${userId}-${correctionRevision}`}
           userId={userId}
         />
       )}
