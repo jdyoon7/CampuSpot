@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { CalendarDays } from 'lucide-react';
 import { useAuth } from '../../shared/auth/useAuth';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
@@ -16,6 +17,9 @@ export default function DiscountsPage() {
       <header>
         <h1>할인·혜택</h1>
         <p>발견한 학생 혜택을 공식 공지와 함께 제보해 주세요.</p>
+        <Link className="discount-calendar-link" to="/discounts/calendar">
+          <CalendarDays size={18} aria-hidden="true" /> 혜택 캘린더
+        </Link>
       </header>
       {state.status === 'signed-out' && (
         <p className="discount-notice">

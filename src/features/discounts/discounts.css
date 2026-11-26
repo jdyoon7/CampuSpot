@@ -177,3 +177,99 @@
   gap: 0.4rem;
   min-height: 44px;
 }
+.discount-calendar-link,
+.discount-calendar h1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.discount-calendar-link {
+  margin-top: 0.75rem;
+  min-height: 44px;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.discount-calendar header > a {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.discount-calendar-panel {
+  max-width: 32rem;
+  margin-block: 1rem;
+  padding: clamp(0.5rem, 2vw, 1.15rem);
+  border: 1px solid #8ea696;
+  border-radius: 0.875rem;
+  background: light-dark(#fff, #1c2a21);
+  color-scheme: light dark;
+}
+
+.discount-calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.discount-calendar-panel table {
+  width: 100%;
+  table-layout: fixed;
+  margin-block: 0.5rem;
+  text-align: center;
+}
+
+.discount-calendar-panel th {
+  padding-block: 0.4rem;
+  font-size: 0.875rem;
+}
+
+.discount-calendar-panel td {
+  padding: 1px;
+}
+
+.discount-calendar-panel button {
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.discount-calendar-toolbar button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  padding: 0;
+}
+
+.discount-calendar-panel td button {
+  width: 100%;
+  padding: 0;
+}
+
+.discount-calendar-panel button:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.discount-calendar-panel button:hover:not(:disabled, [aria-pressed='true']) {
+  background: light-dark(#e8f1e9, #2c4535);
+}
+
+.discount-calendar-panel button[aria-current='date'] {
+  border-color: light-dark(#377854, #94c6a6);
+}
+
+.discount-calendar-panel button[aria-pressed='true'] {
+  background: #195c36;
+  color: white;
+  font-weight: 700;
+}
+
+.discount-calendar-today {
+  padding: 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
