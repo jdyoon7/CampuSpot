@@ -43,7 +43,13 @@ set local role anon;
 select results_eq('select store_name from list_published_discounts()','values (''Test 1''::text)','guest sees only approved, unexpired offer');
 select ok(not exists(select from jsonb_object_keys((select to_jsonb(p) from list_published_discounts() p limit 1)) k where k in ('reporter_id','reviewer_id','rejection_reason')),'published projection has no private fields');
 reset role;
-select is((select count(*) from core_private.discount_review_log),3::bigint,'one audit record per successful transition');
+select is(
+  (select count(*) from core_private.discount_review_log log
+   join discount_reports report on report.id = log.report_id
+   where report.reporter_id = '51000000-0000-4000-8000-000000000001'),
+  3::bigint,
+  'one audit record per successful transition for the test reports'
+);
 select ok(exists(select from core_private.discount_review_log where decision='rejected' and reviewer_id='51000000-0000-4000-8000-000000000003'),'audit identifies reviewer');
 select * from finish();
 rollback;
