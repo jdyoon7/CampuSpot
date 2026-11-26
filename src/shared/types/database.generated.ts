@@ -75,12 +75,90 @@ export type Database = {
           },
         ]
       }
+      discount_corrections: {
+        Row: {
+          created_at: string
+          current_details: string
+          id: string
+          kind: Database["public"]["Enums"]["discount_correction_kind"]
+          offer_id: string
+          offer_revision: number
+          proposed_details: string | null
+          rejection_reason: string | null
+          report_note: string
+          reporter_id: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          source_url: string
+          status: Database["public"]["Enums"]["discount_report_status"]
+          store_name: string
+        }
+        ComputedFields: never
+        Insert: {
+          created_at?: string
+          current_details: string
+          id?: string
+          kind: Database["public"]["Enums"]["discount_correction_kind"]
+          offer_id: string
+          offer_revision: number
+          proposed_details?: string | null
+          rejection_reason?: string | null
+          report_note: string
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          source_url: string
+          status?: Database["public"]["Enums"]["discount_report_status"]
+          store_name: string
+        }
+        Update: {
+          created_at?: string
+          current_details?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["discount_correction_kind"]
+          offer_id?: string
+          offer_revision?: number
+          proposed_details?: string | null
+          rejection_reason?: string | null
+          report_note?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          source_url?: string
+          status?: Database["public"]["Enums"]["discount_report_status"]
+          store_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_corrections_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "discount_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_corrections_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_corrections_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       discount_reports: {
         Row: {
           created_at: string
           details: string
           ends_on: string | null
           id: string
+          publication_revision: number
           rejection_reason: string | null
           reporter_id: string
           reviewed_at: string | null
@@ -89,6 +167,7 @@ export type Database = {
           status: Database["public"]["Enums"]["discount_report_status"]
           store_name: string
           updated_at: string
+          withdrawn_at: string | null
         }
         ComputedFields: never
         Insert: {
@@ -96,6 +175,7 @@ export type Database = {
           details: string
           ends_on?: string | null
           id?: string
+          publication_revision?: number
           rejection_reason?: string | null
           reporter_id: string
           reviewed_at?: string | null
@@ -104,12 +184,14 @@ export type Database = {
           status?: Database["public"]["Enums"]["discount_report_status"]
           store_name: string
           updated_at?: string
+          withdrawn_at?: string | null
         }
         Update: {
           created_at?: string
           details?: string
           ends_on?: string | null
           id?: string
+          publication_revision?: number
           rejection_reason?: string | null
           reporter_id?: string
           reviewed_at?: string | null
@@ -118,6 +200,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["discount_report_status"]
           store_name?: string
           updated_at?: string
+          withdrawn_at?: string | null
         }
         Relationships: [
           {
@@ -381,6 +464,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      review_discount_correction: {
+        Args: {
+          p_correction_id: string
+          p_decision: Database["public"]["Enums"]["discount_report_status"]
+          p_reason?: string
+        }
+        Returns: undefined
+      }
       review_discount_report: {
         Args: {
           p_decision: Database["public"]["Enums"]["discount_report_status"]
@@ -417,6 +508,15 @@ export type Database = {
           verified_at: string
         }[]
       }
+      submit_discount_correction: {
+        Args: {
+          p_details?: string
+          p_kind: Database["public"]["Enums"]["discount_correction_kind"]
+          p_note: string
+          p_offer_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
@@ -426,6 +526,7 @@ export type Database = {
         | "business_owner"
         | "admin"
         | "super_admin"
+      discount_correction_kind: "edit" | "ended" | "incorrect"
       discount_report_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -562,6 +663,7 @@ export const Constants = {
         "admin",
         "super_admin",
       ],
+      discount_correction_kind: ["edit", "ended", "incorrect"],
       discount_report_status: ["pending", "approved", "rejected"],
     },
   },

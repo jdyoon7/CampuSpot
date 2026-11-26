@@ -4,20 +4,30 @@ import { useAuth } from '../../shared/auth/useAuth';
 import { errorFor } from '../../shared/auth/account';
 import { formatKoreanDate } from '../../shared/lib/date';
 import {
+  correctionLabels,
+  loadCorrections,
+  reviewCorrection,
+} from './api/corrections';
+import {
   canReview,
   loadQueue,
   reviewReport,
   type Decision,
-  type PendingReport,
 } from './api/review';
 import { ReportList } from './components/ReportList';
 import { OfferDetails } from './components/OfferDetails';
 
-function ReviewItem({
-  item,
+function ReviewActions({
+  itemId,
+  storeName,
+  approveLabel = '승인',
+  review,
   onChange,
 }: {
-  item: PendingReport;
+  itemId: string;
+  storeName: string;
+  approveLabel?: string;
+  review: (id: string, decision: Decision) => Promise<void>;
   onChange: (message: string) => void;
 }) {
   const [rejecting, setRejecting] = useState(false);
@@ -31,9 +41,9 @@ function ReviewItem({
     setBusy(true);
     setError('');
     try {
-      await reviewReport(item.id, decision);
+      await review(itemId, decision);
       onChange(
-        item.store_name +
+        storeName +
           ' 제보를 ' +
           (decision.status === 'approved' ? '승인했습니다.' : '반려했습니다.'),
       );
@@ -49,9 +59,6 @@ function ReviewItem({
   }
   return (
     <>
-      <strong>{item.store_name}</strong>
-      <OfferDetails offer={item} />
-      <small>{formatKoreanDate(item.created_at)} 접수</small>
       {rejecting ? (
         <form
           className="discount-review-form"
@@ -68,10 +75,10 @@ function ReviewItem({
               value={reason}
               disabled={busy}
               onChange={(e) => setReason(e.target.value)}
-              aria-describedby={'hint-' + item.id}
+              aria-describedby={'hint-' + itemId}
             />
           </label>
-          <small id={'hint-' + item.id}>
+          <small id={'hint-' + itemId}>
             제보자에게 전달됩니다. 어떤 정보를 확인하거나 수정해야 하는지 적어
             주세요.
           </small>
@@ -98,7 +105,7 @@ function ReviewItem({
             className="discount-approve"
             onClick={() => void decide({ status: 'approved' })}
           >
-            승인
+            {approveLabel}
           </button>
           <button disabled={busy} onClick={() => setRejecting(true)}>
             반려
@@ -111,6 +118,11 @@ function ReviewItem({
 }
 function ReviewQueue({ userId }: { userId: string }) {
   const load = useCallback((page: number) => loadQueue(userId, page), [userId]);
+  const loadEdits = useCallback(
+    (page: number) => loadCorrections(userId, page, true),
+    [userId],
+  );
+  const [correctionRevision, setCorrectionRevision] = useState(0);
   const [revision, setRevision] = useState(0),
     [notice, setNotice] = useState('');
   return (
@@ -121,6 +133,7 @@ function ReviewQueue({ userId }: { userId: string }) {
         onClick={() => {
           setNotice('');
           setRevision((n) => n + 1);
+          setCorrectionRevision((n) => n + 1);
         }}
       >
         목록 새로고침
@@ -133,13 +146,60 @@ function ReviewQueue({ userId }: { userId: string }) {
         load={load}
       >
         {(item) => (
-          <ReviewItem
-            item={item}
-            onChange={(message) => {
-              setNotice(message);
-              setRevision((n) => n + 1);
-            }}
-          />
+          <>
+            <strong>{item.store_name}</strong>
+            <OfferDetails offer={item} />
+            <small>{formatKoreanDate(item.created_at)} 접수</small>
+            <ReviewActions
+              itemId={item.id}
+              storeName={item.store_name}
+              review={reviewReport}
+              onChange={(message) => {
+                setNotice(message);
+                setRevision((n) => n + 1);
+              }}
+            />
+          </>
+        )}
+      </ReportList>
+      <ReportList
+        key={'corrections-' + correctionRevision}
+        title="정정 제보 검수 대기"
+        empty="검수할 정정 제보가 없습니다."
+        load={loadEdits}
+      >
+        {(item) => (
+          <>
+            <strong>
+              {item.store_name} · {correctionLabels[item.kind]}
+            </strong>
+            <p>
+              <strong>접수 당시 내용</strong> {item.current_details}
+            </p>
+            {item.proposed_details && (
+              <p>
+                <strong>수정 제안</strong> {item.proposed_details}
+              </p>
+            )}
+            <p>
+              <strong>제보 사유</strong> {item.report_note}
+            </p>
+            <a href={item.source_url} target="_blank" rel="noreferrer">
+              공식 공지 보기
+            </a>
+            <ReviewActions
+              itemId={item.id}
+              storeName={item.store_name + ' 정정'}
+              approveLabel={
+                item.kind === 'edit' ? '수정 승인' : '공개 중단 승인'
+              }
+              review={reviewCorrection}
+              onChange={(message) => {
+                setNotice(message);
+                setCorrectionRevision((n) => n + 1);
+              }}
+            />
+          </>
         )}
       </ReportList>
     </>

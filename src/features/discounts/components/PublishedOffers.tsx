@@ -3,6 +3,7 @@ import { formatKoreanDate } from '../../../shared/lib/date';
 import { searchPublished, type SearchFilters } from '../api/search';
 import { ReportList } from './ReportList';
 import { OfferDetails } from './OfferDetails';
+import { CorrectionForm } from './CorrectionForm';
 
 const emptyFilters: SearchFilters = {
   query: '',
@@ -10,7 +11,11 @@ const emptyFilters: SearchFilters = {
   endingSoon: false,
 };
 
-export function PublishedOffers() {
+export function PublishedOffers({
+  onCorrectionSaved,
+}: {
+  onCorrectionSaved: () => void;
+}) {
   const [draft, setDraft] = useState(emptyFilters);
   const [{ filters: applied, revision }, setSearch] = useState({
     filters: emptyFilters,
@@ -93,6 +98,7 @@ export function PublishedOffers() {
             <strong>{offer.store_name}</strong>
             <OfferDetails offer={offer} />
             <small>{formatKoreanDate(offer.verified_at)} 검수</small>
+            <CorrectionForm offerId={offer.id} onSaved={onCorrectionSaved} />
           </>
         )}
       </ReportList>
