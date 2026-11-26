@@ -3,6 +3,7 @@ import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../shared/lib/supabase';
 import { useAuth } from '../../shared/auth/useAuth';
+import { withBusinessLinks } from '../business/api';
 import { withBookmarkStatus } from './api/bookmarks';
 import { listCalendarOffers } from './api/calendar';
 import { BookmarkButton } from './components/BookmarkButton';
@@ -40,7 +41,12 @@ export function CalendarPage() {
   const size = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
   const load = useCallback(
     async (page: number) =>
-      withBookmarkStatus(await listCalendarOffers(activeDay, page), userId),
+      withBusinessLinks(
+        await withBookmarkStatus(
+          await listCalendarOffers(activeDay, page),
+          userId,
+        ),
+      ),
     [activeDay, userId],
   );
 
@@ -154,6 +160,13 @@ export function CalendarPage() {
               <>
                 <strong>{offer.store_name}</strong>
                 <OfferDetails offer={offer} />
+                {offer.business && (
+                  <Link
+                    to={'/discounts/business/' + offer.business.business_id}
+                  >
+                    매장 정보 · {offer.business.branch_name}
+                  </Link>
+                )}
                 {userId && (
                   <BookmarkButton
                     offerId={offer.id}
