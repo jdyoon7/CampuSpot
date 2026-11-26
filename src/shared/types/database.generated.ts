@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      businesses: {
+        Row: {
+          address: string
+          branch_name: string
+          created_at: string
+          id: string
+          name: string
+          registered_by: string | null
+          source_url: string
+        }
+        ComputedFields: never
+        Insert: {
+          address: string
+          branch_name: string
+          created_at?: string
+          id?: string
+          name: string
+          registered_by?: string | null
+          source_url: string
+        }
+        Update: {
+          address?: string
+          branch_name?: string
+          created_at?: string
+          id?: string
+          name?: string
+          registered_by?: string | null
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_registered_by_fkey"
+            columns: ["registered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campuses: {
         Row: {
           created_at: string
@@ -152,8 +191,47 @@ export type Database = {
           },
         ]
       }
+      discount_offer_bookmarks: {
+        Row: {
+          created_at: string
+          offer_id: string
+          store_name: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          created_at?: string
+          offer_id: string
+          store_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          offer_id?: string
+          store_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_offer_bookmarks_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "discount_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_offer_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       discount_reports: {
         Row: {
+          available_weekdays: number[] | null
+          business_id: string | null
           created_at: string
           details: string
           ends_on: string | null
@@ -171,6 +249,8 @@ export type Database = {
         }
         ComputedFields: never
         Insert: {
+          available_weekdays?: number[] | null
+          business_id?: string | null
           created_at?: string
           details: string
           ends_on?: string | null
@@ -187,6 +267,8 @@ export type Database = {
           withdrawn_at?: string | null
         }
         Update: {
+          available_weekdays?: number[] | null
+          business_id?: string | null
           created_at?: string
           details?: string
           ends_on?: string | null
@@ -203,6 +285,13 @@ export type Database = {
           withdrawn_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "discount_reports_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "discount_reports_reporter_id_fkey"
             columns: ["reporter_id"]
@@ -436,6 +525,18 @@ export type Database = {
         Args: { p_digest: string; p_email: string; p_user: string }
         Returns: string
       }
+      list_business_discounts: {
+        Args: { p_business_id: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          details: string
+          ends_on: string | null
+          id: string
+          source_url: string
+          starts_on: string | null
+          store_name: string
+          verified_at: string
+        }[]
+      }
       list_discount_calendar: {
         Args: { p_day: string; p_limit?: number; p_offset?: number }
         Returns: {
@@ -446,6 +547,27 @@ export type Database = {
           starts_on: string
           store_name: string
           verified_at: string
+        }[]
+      }
+      list_my_discount_offer_bookmarks: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          available: boolean
+          details: string | null
+          ends_on: string | null
+          id: string
+          source_url: string | null
+          starts_on: string | null
+          store_name: string
+        }[]
+      }
+      list_public_discount_business_links: {
+        Args: { p_offer_ids: string[] }
+        Returns: {
+          branch_name: string
+          business_id: string
+          name: string
+          offer_id: string
         }[]
       }
       list_published_discounts: {
@@ -507,6 +629,14 @@ export type Database = {
           store_name: string
           verified_at: string
         }[]
+      }
+      set_discount_business_link: {
+        Args: { p_business_id: string; p_linked: boolean; p_offer_id: string }
+        Returns: undefined
+      }
+      set_discount_offer_bookmark: {
+        Args: { p_offer_id: string; p_saved: boolean }
+        Returns: undefined
       }
       submit_discount_correction: {
         Args: {

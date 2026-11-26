@@ -1,6 +1,10 @@
 import { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { withBusinessLinks } from '../../business/api';
 import { formatKoreanDate } from '../../../shared/lib/date';
 import { searchPublished, type SearchFilters } from '../api/search';
+import { withBookmarkStatus } from '../api/bookmarks';
+import { BookmarkButton } from './BookmarkButton';
 import { ReportList } from './ReportList';
 import { OfferDetails } from './OfferDetails';
 import { CorrectionForm } from './CorrectionForm';
@@ -13,8 +17,10 @@ const emptyFilters: SearchFilters = {
 
 export function PublishedOffers({
   onCorrectionSaved,
+  userId,
 }: {
   onCorrectionSaved: () => void;
+  userId?: string;
 }) {
   const [draft, setDraft] = useState(emptyFilters);
   const [{ filters: applied, revision }, setSearch] = useState({
@@ -25,8 +31,11 @@ export function PublishedOffers({
     setSearch((current) => ({ filters, revision: current.revision + 1 }));
   }
   const load = useCallback(
-    (page: number) => searchPublished(applied, page),
-    [applied],
+    async (page: number) =>
+      withBusinessLinks(
+        await withBookmarkStatus(await searchPublished(applied, page), userId),
+      ),
+    [applied, userId],
   );
   const hasFilters = Boolean(
     applied.query || applied.todayOnly || applied.endingSoon,
@@ -84,7 +93,7 @@ export function PublishedOffers({
         </div>
       </form>
       <ReportList
-        key={revision}
+        key={(userId ?? 'guest') + '-' + revision}
         title="공개 혜택"
         empty={
           hasFilters
@@ -97,7 +106,15 @@ export function PublishedOffers({
           <>
             <strong>{offer.store_name}</strong>
             <OfferDetails offer={offer} />
+            {offer.business && (
+              <Link to={'/discounts/business/' + offer.business.business_id}>
+                매장 정보 · {offer.business.branch_name}
+              </Link>
+            )}
             <small>{formatKoreanDate(offer.verified_at)} 검수</small>
+            {userId && (
+              <BookmarkButton offerId={offer.id} initialSaved={offer.saved} />
+            )}
             <CorrectionForm offerId={offer.id} onSaved={onCorrectionSaved} />
           </>
         )}
