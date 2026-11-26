@@ -241,12 +241,15 @@ export function BusinessDetail() {
           <BusinessFollowButton businessId={business.id} />
           {state.status === 'ready' && canReview(state.account.roles) && (
             <BusinessDiscovery
-              key={business.id}
+              key={`discovery-${business.id}`}
               business={business}
               onSaved={() => setAttempt((n) => n + 1)}
             />
           )}
-          <BusinessOffers key={business.id} businessId={business.id} />
+          <BusinessOffers
+            key={`offers-${business.id}`}
+            businessId={business.id}
+          />
         </>
       )}
     </article>
