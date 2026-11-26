@@ -19,6 +19,8 @@ import {
 } from './api';
 import { businessPath } from './BusinessDirectory';
 import { BusinessFollowButton } from './BusinessFollowButton';
+import { BusinessDiscovery } from './BusinessDiscovery';
+import { businessCategoryLabels } from './categories';
 
 function OfferPicker({
   businessId,
@@ -164,6 +166,7 @@ function BusinessOffers({ businessId }: { businessId: string }) {
 }
 
 export function BusinessDetail() {
+  const { state } = useAuth();
   const { businessId = '' } = useParams();
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{
@@ -222,10 +225,27 @@ export function BusinessDetail() {
       ) : (
         <>
           <p>{business.address}</p>
+          {(business.region || business.category) && (
+            <p>
+              {[
+                business.region,
+                business.category && businessCategoryLabels[business.category],
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          )}
           <a href={business.source_url} target="_blank" rel="noreferrer">
             매장 공식 정보 보기
           </a>
           <BusinessFollowButton businessId={business.id} />
+          {state.status === 'ready' && canReview(state.account.roles) && (
+            <BusinessDiscovery
+              key={business.id}
+              business={business}
+              onSaved={() => setAttempt((n) => n + 1)}
+            />
+          )}
           <BusinessOffers key={business.id} businessId={business.id} />
         </>
       )}
