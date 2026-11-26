@@ -18,6 +18,7 @@ import {
   withBusinessLinks,
 } from './api';
 import { businessPath } from './BusinessDirectory';
+import { BusinessFollowButton } from './BusinessFollowButton';
 
 function OfferPicker({
   businessId,
@@ -224,6 +225,7 @@ export function BusinessDetail() {
           <a href={business.source_url} target="_blank" rel="noreferrer">
             매장 공식 정보 보기
           </a>
+          <BusinessFollowButton businessId={business.id} />
           <BusinessOffers key={business.id} businessId={business.id} />
         </>
       )}
