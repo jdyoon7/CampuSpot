@@ -62,3 +62,9 @@
 정정 제보 migration 다음에 `20261126064652_discounts_offer_bookmarks.sql`을 적용합니다. `set_discount_offer_bookmark`는 현재 로그인한 사용자의 저장 상태를 변경하고, 공개 중인 혜택만 저장합니다. 사용자와 혜택의 조합이 고유하므로 같은 요청을 다시 받아도 한 번만 저장됩니다. 저장 목록은 `list_my_discount_offer_bookmarks`에서 20개씩 조회합니다.
 
 공유 개발 DB에 적용했고, 롤백 방식의 SQL 검사 14개와 모바일 브라우저의 저장·재접속·본인 조회·공개 중단·저장 해제를 확인했습니다. `npm run check`와 `npm run test:e2e`도 통과했습니다. 로컬 Docker DB 전체 검사는 실행하지 않았습니다. 기능을 내릴 때는 화면을 되돌리고 저장 기록을 보존합니다.
+
+## 운영 요일과 고려대 공개 혜택
+
+`20261126065652_discounts_offer_weekdays.sql`은 선택적으로 ISO 요일(월요일 1, 일요일 7)을 설정합니다. 검색의 **오늘 이용 가능** 필터와 캘린더가 주어진 날짜의 운영 요일을 확인합니다. 입력이 없는 기존 제보는 기존 날짜 기준을 따릅니다.
+
+공유 개발 DB에 고려대학교 서울캠퍼스와 2026년 2학기 **천원의 아침밥** 운영 식당 3곳을 등록했습니다. 이 데이터는 학교 공식 자료를 확인한 2026-11-26 기준으로 등록했으며, 마이그레이션에는 실제 데이터가 포함되지 않습니다. 기간은 학사일정 기준 2026-09-01부터 2026-12-18까지입니다. 가격은 1,000원이고 월~금 08:00~09:30에 운영합니다. 안암학사 식당에는 거주자 대상·수량 제한을 별도로 표시합니다. [고려대학교 캠퍼스 안내](https://scholarship.korea.ac.kr/temp_g/info/map.do) · [학생지원팀 운영 안내](https://www.korea.ac.kr/portalBoard/ko/1/000060000000061537/portalBoardView.do) · [학사일정](https://registrar.korea.ac.kr/eduinfo/affairs/schedule.do) · [안암학사 식단](https://www.korea.ac.kr/diet/ko/10/view.do)

@@ -191,6 +191,7 @@ export type Database = {
       }
       discount_reports: {
         Row: {
+          available_weekdays: number[] | null
           created_at: string
           details: string
           ends_on: string | null
@@ -208,6 +209,7 @@ export type Database = {
         }
         ComputedFields: never
         Insert: {
+          available_weekdays?: number[] | null
           created_at?: string
           details: string
           ends_on?: string | null
@@ -224,6 +226,7 @@ export type Database = {
           withdrawn_at?: string | null
         }
         Update: {
+          available_weekdays?: number[] | null
           created_at?: string
           details?: string
           ends_on?: string | null
