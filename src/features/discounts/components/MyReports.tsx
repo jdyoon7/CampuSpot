@@ -15,7 +15,7 @@ export function MyReports({ userId }: { userId: string }) {
         <>
           <div className="discount-meta">
             <strong>{r.store_name}</strong>
-            <span>{statusLabels[r.status]}</span>
+            <span>{r.withdrawn_at ? '공개 중단' : statusLabels[r.status]}</span>
           </div>
           <OfferDetails offer={r} />
           <small>{formatKoreanDate(r.created_at)} 접수</small>

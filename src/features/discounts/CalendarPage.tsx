@@ -3,6 +3,7 @@ import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../shared/lib/supabase';
 import { listCalendarOffers } from './api/calendar';
+import { CorrectionForm } from './components/CorrectionForm';
 import { OfferDetails } from './components/OfferDetails';
 import { ReportList } from './components/ReportList';
 import './discounts.css';
@@ -147,6 +148,7 @@ export function CalendarPage() {
               <>
                 <strong>{offer.store_name}</strong>
                 <OfferDetails offer={offer} />
+                <CorrectionForm offerId={offer.id} />
               </>
             )}
           </ReportList>

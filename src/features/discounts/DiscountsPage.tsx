@@ -4,6 +4,7 @@ import { CalendarDays } from 'lucide-react';
 import { useAuth } from '../../shared/auth/useAuth';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
+import { MyCorrections } from './components/MyCorrections';
 import { canReview } from './api/review';
 import { PublishedOffers } from './components/PublishedOffers';
 import './discounts.css';
@@ -11,6 +12,7 @@ import './discounts.css';
 export default function DiscountsPage() {
   const { state, refresh } = useAuth(),
     [revision, setRevision] = useState(0);
+  const [correctionRevision, setCorrectionRevision] = useState(0);
   const userId = state.status === 'ready' ? state.user.id : undefined;
   return (
     <article className="discounts-page">
@@ -44,13 +46,23 @@ export default function DiscountsPage() {
           제보 검수하기
         </Link>
       )}
-      {state.status !== 'unconfigured' && <PublishedOffers />}
+      {state.status !== 'unconfigured' && (
+        <PublishedOffers
+          onCorrectionSaved={() => setCorrectionRevision((n) => n + 1)}
+        />
+      )}
       <ReportForm
         key={userId ?? 'guest'}
         userId={userId}
         onSaved={() => setRevision((v) => v + 1)}
       />
       {userId && <MyReports key={userId + '-' + revision} userId={userId} />}
+      {userId && (
+        <MyCorrections
+          key={userId + '-' + correctionRevision}
+          userId={userId}
+        />
+      )}
     </article>
   );
 }

@@ -60,7 +60,7 @@ export async function listReports(userId: string, page: number) {
   const { data, error } = await client()
     .from('discount_reports')
     .select(
-      'id,store_name,details,source_url,starts_on,ends_on,status,created_at,rejection_reason',
+      'id,store_name,details,source_url,starts_on,ends_on,status,created_at,rejection_reason,withdrawn_at',
     )
     .eq('reporter_id', userId)
     .order('created_at', { ascending: false })
