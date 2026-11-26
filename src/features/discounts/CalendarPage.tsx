@@ -2,7 +2,10 @@ import { useCallback, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../shared/lib/supabase';
+import { useAuth } from '../../shared/auth/useAuth';
+import { withBookmarkStatus } from './api/bookmarks';
 import { listCalendarOffers } from './api/calendar';
+import { BookmarkButton } from './components/BookmarkButton';
 import { CorrectionForm } from './components/CorrectionForm';
 import { OfferDetails } from './components/OfferDetails';
 import { ReportList } from './components/ReportList';
@@ -22,6 +25,8 @@ const week = ['일', '월', '화', '수', '목', '금', '토'];
 const dayAt = (key: string) => new Date(key + 'T00:00:00Z');
 
 export function CalendarPage() {
+  const { state } = useAuth();
+  const userId = state.status === 'ready' ? state.user.id : undefined;
   const today = seoulDate.format(new Date());
   const [selected, setSelected] = useState(today);
   const [month, setMonth] = useState(today.slice(0, 7));
@@ -34,8 +39,9 @@ export function CalendarPage() {
   const offset = first.getUTCDay();
   const size = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
   const load = useCallback(
-    (page: number) => listCalendarOffers(activeDay, page),
-    [activeDay],
+    async (page: number) =>
+      withBookmarkStatus(await listCalendarOffers(activeDay, page), userId),
+    [activeDay, userId],
   );
 
   function moveMonth(step: number) {
@@ -139,7 +145,7 @@ export function CalendarPage() {
             </button>
           </section>
           <ReportList
-            key={activeDay}
+            key={(userId ?? 'guest') + '-' + activeDay}
             title={koreanDay.format(dayAt(activeDay)) + ' 혜택'}
             empty="이 날짜에 이용할 수 있는 공개 혜택이 없습니다."
             load={load}
@@ -148,6 +154,12 @@ export function CalendarPage() {
               <>
                 <strong>{offer.store_name}</strong>
                 <OfferDetails offer={offer} />
+                {userId && (
+                  <BookmarkButton
+                    offerId={offer.id}
+                    initialSaved={offer.saved}
+                  />
+                )}
                 <CorrectionForm offerId={offer.id} />
               </>
             )}

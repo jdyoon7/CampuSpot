@@ -152,6 +152,43 @@ export type Database = {
           },
         ]
       }
+      discount_offer_bookmarks: {
+        Row: {
+          created_at: string
+          offer_id: string
+          store_name: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          created_at?: string
+          offer_id: string
+          store_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          offer_id?: string
+          store_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_offer_bookmarks_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "discount_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_offer_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       discount_reports: {
         Row: {
           created_at: string
@@ -448,6 +485,18 @@ export type Database = {
           verified_at: string
         }[]
       }
+      list_my_discount_offer_bookmarks: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          available: boolean
+          details: string | null
+          ends_on: string | null
+          id: string
+          source_url: string | null
+          starts_on: string | null
+          store_name: string
+        }[]
+      }
       list_published_discounts: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -507,6 +556,10 @@ export type Database = {
           store_name: string
           verified_at: string
         }[]
+      }
+      set_discount_offer_bookmark: {
+        Args: { p_offer_id: string; p_saved: boolean }
+        Returns: undefined
       }
       submit_discount_correction: {
         Args: {

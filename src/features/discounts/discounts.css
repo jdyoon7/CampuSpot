@@ -309,3 +309,21 @@
 .discount-history .discount-correction p a {
   display: inline;
 }
+
+.discount-utility-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.25rem;
+}
+
+.discount-bookmark {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-block: 0.7rem 0.25rem;
+}
+
+.discount-bookmark[aria-pressed='true'] {
+  background: #195c36;
+  color: white;
+}
