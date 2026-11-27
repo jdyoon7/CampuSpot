@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { errorFor } from '../../shared/auth/account';
+import { client, errorFor } from '../../shared/auth/account';
 import { useAuth } from '../../shared/auth/useAuth';
 import { supabase } from '../../shared/lib/supabase';
 import { ActionForm } from '../auth/ActionForm';
@@ -20,6 +20,8 @@ import {
 import { businessPath } from './BusinessDirectory';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { BusinessDiscovery } from './BusinessDiscovery';
+import { BusinessPhoto } from './BusinessPhoto';
+import { BusinessOperations } from './BusinessOperations';
 import { BusinessMapLink } from './BusinessMapLink';
 import { businessCategoryLabels } from './categories';
 
@@ -166,6 +168,20 @@ function BusinessOffers({ businessId }: { businessId: string }) {
   );
 }
 
+async function recordBusinessEvent(
+  businessId: string,
+  kind: 'view' | 'official_click',
+) {
+  try {
+    await client().rpc('record_discount_business_event', {
+      p_business: businessId,
+      p_kind: kind,
+    });
+  } catch {
+    // Reporting is optional; the detail page and official link remain available.
+  }
+}
+
 export function BusinessDetail() {
   const { state } = useAuth();
   const { businessId = '' } = useParams();
@@ -197,6 +213,11 @@ export function BusinessDetail() {
   }, [attempt, businessId]);
   const current = result?.id === businessId ? result : undefined;
   const business = current?.data;
+  const viewedId = business?.id;
+  const viewerId = state.status === 'ready' ? state.user.id : undefined;
+  useEffect(() => {
+    if (viewedId && viewerId) void recordBusinessEvent(viewedId, 'view');
+  }, [viewedId, viewerId]);
 
   return (
     <article className="discounts-page">
@@ -225,6 +246,13 @@ export function BusinessDetail() {
         <p>등록된 매장을 찾을 수 없습니다.</p>
       ) : (
         <>
+          {business.photo_path && (
+            <BusinessPhoto
+              key={business.photo_path}
+              path={business.photo_path}
+              name={businessName(business)}
+            />
+          )}
           <p>{business.address}</p>
           {(business.region || business.category) && (
             <p>
@@ -243,6 +271,10 @@ export function BusinessDetail() {
             />
             <a
               className="discount-review-link"
+              onClick={() => {
+                if (viewerId)
+                  void recordBusinessEvent(business.id, 'official_click');
+              }}
               href={business.source_url}
               target="_blank"
               rel="noreferrer"
@@ -250,7 +282,20 @@ export function BusinessDetail() {
               매장 공식 정보 보기
             </a>
           </div>
+          {business.description && <p>{business.description}</p>}
+          {business.opening_hours && <p>영업시간 {business.opening_hours}</p>}
+          {business.menu_url && (
+            <a href={business.menu_url} target="_blank" rel="noreferrer">
+              메뉴·가격 보기
+            </a>
+          )}
           <BusinessFollowButton businessId={business.id} />
+          <BusinessOperations
+            key={`operations-${business.id}-${state.status === 'ready' ? state.user.id : 'guest'}`}
+            business={business}
+            userId={state.status === 'ready' ? state.user.id : undefined}
+            onChanged={() => setAttempt((n) => n + 1)}
+          />
           {state.status === 'ready' && canReview(state.account.roles) && (
             <BusinessDiscovery
               key={`discovery-${business.id}`}
