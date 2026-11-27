@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client, errorFor } from '../../shared/auth/account';
 import { ActionForm } from '../auth/ActionForm';
+import { StoreAdCheckout } from '../payments/StoreAdCheckout';
 import { BusinessMenu, OwnedBusinessTools } from './BusinessManagement';
 import { BusinessPhotoEditor } from './BusinessPhoto';
 import { SchoolSelect } from '../auth/SchoolSelect';
@@ -265,6 +266,7 @@ export function BusinessOperations({
           <>
             <OperatorTools business={business} refresh={refresh} />
             <OwnedBusinessTools id={business.id} />
+            <StoreAdCheckout businessId={business.id} />
           </>
         ) : (
           <>

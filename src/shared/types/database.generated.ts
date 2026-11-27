@@ -1466,6 +1466,66 @@ export type Database = {
         Args: { p_ending: boolean; p_new_offer: boolean; p_starting: boolean }
         Returns: undefined
       }
+      prepare_groble_ad_order: {
+        Args: {
+          p_business: string
+          p_buyer: string
+          p_duration: number
+          p_price: number
+          p_product: string
+        }
+        Returns: string
+      }
+      record_groble_ad_event: {
+        Args: {
+          p_amount: number
+          p_delivery: string
+          p_event: string
+          p_kind: string
+          p_merchant: string
+          p_occurred_at: string
+          p_order?: string
+          p_paid_at?: string
+          p_product: string
+          p_refund_amount?: number
+          p_refund_at?: string
+        }
+        Returns: string
+      }
+      list_my_groble_ad_orders: {
+        Args: { p_business: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          active_until: string | null
+          cancel_requested_at: string | null
+          created_at: string
+          duration_hours: number
+          id: string
+          paid_at: string | null
+          price_krw: number
+          refunded_krw: number
+        }[]
+      }
+      list_groble_ad_payment_review: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          amount_krw: number
+          event_at: string
+          id: string
+          kind: string
+          merchant_id: string
+          outcome: string
+          refunded_krw: number | null
+        }[]
+      }
+      list_active_groble_store_ads: {
+        Args: { p_limit?: number }
+        Returns: {
+          branch_name: string
+          description: string | null
+          id: string
+          name: string
+        }[]
+      }
       review_discount_report: {
         Args: {
           p_decision: Database["public"]["Enums"]["discount_report_status"]

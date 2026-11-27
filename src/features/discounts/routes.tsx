@@ -3,6 +3,7 @@ import DiscountsPage from './DiscountsPage';
 import { ReviewPage } from './ReviewPage';
 import { CalendarPage } from './CalendarPage';
 import { DiscountWallet } from './DiscountWallet';
+import { GrobleReviewPage } from '../payments/GrobleReviewPage';
 import { BusinessDashboard } from '../business/BusinessDashboard';
 import { ScheduleReview } from '../business/ScheduleReview';
 import { PointReview } from './PointReview';
@@ -20,6 +21,7 @@ export const discountsRoutes = (
   <>
     <Route path="/discounts/coupons" element={<DiscountWallet />} />
     <Route path="/discounts/review/schedules" element={<ScheduleReview />} />
+    <Route path="/discounts/review/payments" element={<GrobleReviewPage />} />
     <Route path="/discounts/review/points" element={<PointReview />} />
     <Route path="/discounts/review/operators" element={<OperatorReview />} />
     <Route path="/discounts/map" element={<DiscountMapPage />} />

@@ -9,6 +9,7 @@ import {
   Ticket,
 } from 'lucide-react';
 import { useAuth } from '../../shared/auth/useAuth';
+import { PromotedStores } from '../payments/PromotedStores';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
 import { MyCorrections } from './components/MyCorrections';
@@ -73,6 +74,7 @@ export default function DiscountsPage() {
           제보 검수하기
         </Link>
       )}
+      {state.status !== 'unconfigured' && <PromotedStores />}
       {state.status !== 'unconfigured' && (
         <PublishedOffers
           userId={userId}
