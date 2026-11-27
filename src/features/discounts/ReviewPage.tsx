@@ -215,6 +215,11 @@ export function ReviewPage() {
       <header>
         <h1>혜택 제보 검수</h1>
       </header>
+      {state.status === 'ready' && canReview(state.account.roles) && (
+        <Link className="discount-review-link" to="/discounts/review/operators">
+          매장 운영자 검수
+        </Link>
+      )}
       {state.status === 'ready' &&
         (canReview(state.account.roles) ? (
           <ReviewQueue key={state.user.id} userId={state.user.id} />

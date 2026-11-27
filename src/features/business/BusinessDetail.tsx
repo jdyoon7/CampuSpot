@@ -20,6 +20,7 @@ import {
 import { businessPath } from './BusinessDirectory';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { BusinessDiscovery } from './BusinessDiscovery';
+import { BusinessOperations } from './BusinessOperations';
 import { BusinessMapLink } from './BusinessMapLink';
 import { businessCategoryLabels } from './categories';
 
@@ -250,7 +251,20 @@ export function BusinessDetail() {
               매장 공식 정보 보기
             </a>
           </div>
+          {business.description && <p>{business.description}</p>}
+          {business.opening_hours && <p>영업시간 {business.opening_hours}</p>}
+          {business.menu_url && (
+            <a href={business.menu_url} target="_blank" rel="noreferrer">
+              메뉴·가격 보기
+            </a>
+          )}
           <BusinessFollowButton businessId={business.id} />
+          <BusinessOperations
+            key={`operations-${business.id}-${state.status === 'ready' ? state.user.id : 'guest'}`}
+            business={business}
+            userId={state.status === 'ready' ? state.user.id : undefined}
+            onChanged={() => setAttempt((n) => n + 1)}
+          />
           {state.status === 'ready' && canReview(state.account.roles) && (
             <BusinessDiscovery
               key={`discovery-${business.id}`}
