@@ -19,7 +19,7 @@ export async function getBusiness(id: string) {
   const { data, error } = await client()
     .from('businesses')
     .select(
-      'id,name,branch_name,address,source_url,nearby_university_id,region,category',
+      'id,name,branch_name,address,source_url,nearby_university_id,region,category,description,opening_hours,menu_url,latitude,longitude,photo_path',
     )
     .eq('id', id)
     .maybeSingle();

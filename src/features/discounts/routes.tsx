@@ -2,6 +2,9 @@ import { Route } from 'react-router-dom';
 import DiscountsPage from './DiscountsPage';
 import { ReviewPage } from './ReviewPage';
 import { CalendarPage } from './CalendarPage';
+import { DiscountWallet } from './DiscountWallet';
+import { PointReview } from './PointReview';
+import { OperatorReview } from '../business/OperatorReview';
 import { BookmarksPage } from './BookmarksPage';
 import {
   BusinessDirectory,
@@ -13,6 +16,9 @@ import { FollowedBusinessesPage } from '../business/FollowedBusinessesPage';
 import { BusinessAlertsPage } from '../notifications/BusinessAlertsPage';
 export const discountsRoutes = (
   <>
+    <Route path="/discounts/coupons" element={<DiscountWallet />} />
+    <Route path="/discounts/review/points" element={<PointReview />} />
+    <Route path="/discounts/review/operators" element={<OperatorReview />} />
     <Route path="/discounts/map" element={<DiscountMapPage />} />
     <Route path="/discounts/review" element={<ReviewPage />} />
     <Route path="/discounts/calendar" element={<CalendarPage />} />

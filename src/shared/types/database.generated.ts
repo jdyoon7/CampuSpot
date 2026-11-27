@@ -92,22 +92,33 @@ export type Database = {
           branch_name: string
           category: Database["public"]["Enums"]["business_category"] | null
           created_at: string
+          description: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
+          menu_url: string | null
           name: string
           nearby_university_id: string | null
+          opening_hours: string | null
+          photo_path: string | null
           region: string | null
           registered_by: string | null
           source_url: string
         }
-        ComputedFields: never
         Insert: {
           address: string
           branch_name: string
           category?: Database["public"]["Enums"]["business_category"] | null
           created_at?: string
+          description?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
+          menu_url?: string | null
           name: string
           nearby_university_id?: string | null
+          opening_hours?: string | null
+          photo_path?: string | null
           region?: string | null
           registered_by?: string | null
           source_url: string
@@ -117,9 +128,15 @@ export type Database = {
           branch_name?: string
           category?: Database["public"]["Enums"]["business_category"] | null
           created_at?: string
+          description?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
+          menu_url?: string | null
           name?: string
           nearby_university_id?: string | null
+          opening_hours?: string | null
+          photo_path?: string | null
           region?: string | null
           registered_by?: string | null
           source_url?: string
@@ -135,6 +152,217 @@ export type Database = {
           {
             foreignKeyName: "businesses_registered_by_fkey"
             columns: ["registered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_operator_requests: {
+        Row: {
+          business_id: string
+          created_at: string
+          evidence_url: string
+          id: string
+          note: string
+          requested_by: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          evidence_url: string
+          id?: string
+          note: string
+          requested_by: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          evidence_url?: string
+          id?: string
+          note?: string
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_operator_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_operator_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_operator_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_coupon_campaigns: {
+        Row: {
+          active: boolean
+          business_id: string
+          created_at: string
+          ends_on: string
+          id: string
+          issued_count: number
+          points_cost: number
+          quantity: number
+          redeemed_count: number
+          starts_on: string
+          terms: string
+          title: string
+          university_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          business_id: string
+          created_at?: string
+          ends_on: string
+          id?: string
+          issued_count?: number
+          points_cost?: number
+          quantity: number
+          redeemed_count?: number
+          starts_on: string
+          terms: string
+          title: string
+          university_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          business_id?: string
+          created_at?: string
+          ends_on?: string
+          id?: string
+          issued_count?: number
+          points_cost?: number
+          quantity?: number
+          redeemed_count?: number
+          starts_on?: string
+          terms?: string
+          title?: string
+          university_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_coupon_campaigns_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_coupon_campaigns_university_id_fkey"
+            columns: ["university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_user_coupons: {
+        Row: {
+          campaign_id: string
+          claimed_at: string
+          code: string
+          redeemed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          claimed_at?: string
+          code?: string
+          redeemed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          claimed_at?: string
+          code?: string
+          redeemed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_user_coupons_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "discount_coupon_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_user_coupons_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      point_ledger: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          memo: string | null
+          performed_by: string | null
+          reward_key: string
+          source: string
+          source_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          memo?: string | null
+          performed_by?: string | null
+          reward_key: string
+          source: string
+          source_id: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          memo?: string | null
+          performed_by?: string | null
+          reward_key?: string
+          source?: string
+          source_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "point_ledger_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "point_ledger_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -323,13 +551,18 @@ export type Database = {
       }
       discount_reports: {
         Row: {
+          available_from: string | null
+          available_until: string | null
           available_weekdays: number[] | null
           business_id: string | null
           business_linked_at: string | null
           created_at: string
           details: string
+          discount_amount: number | null
+          discount_percent: number | null
           ends_on: string | null
           id: string
+          is_partnership: boolean
           publication_revision: number
           rejection_reason: string | null
           reporter_id: string
@@ -338,18 +571,25 @@ export type Database = {
           starts_on: string | null
           status: Database["public"]["Enums"]["discount_report_status"]
           store_name: string
+          submitted_by_operator: boolean
+          target_department_id: string | null
+          target_university_id: string | null
           updated_at: string
           withdrawn_at: string | null
         }
-        ComputedFields: never
         Insert: {
+          available_from?: string | null
+          available_until?: string | null
           available_weekdays?: number[] | null
           business_id?: string | null
           business_linked_at?: string | null
           created_at?: string
           details: string
+          discount_amount?: number | null
+          discount_percent?: number | null
           ends_on?: string | null
           id?: string
+          is_partnership?: boolean
           publication_revision?: number
           rejection_reason?: string | null
           reporter_id: string
@@ -358,17 +598,25 @@ export type Database = {
           starts_on?: string | null
           status?: Database["public"]["Enums"]["discount_report_status"]
           store_name: string
+          submitted_by_operator?: boolean
+          target_department_id?: string | null
+          target_university_id?: string | null
           updated_at?: string
           withdrawn_at?: string | null
         }
         Update: {
+          available_from?: string | null
+          available_until?: string | null
           available_weekdays?: number[] | null
           business_id?: string | null
           business_linked_at?: string | null
           created_at?: string
           details?: string
+          discount_amount?: number | null
+          discount_percent?: number | null
           ends_on?: string | null
           id?: string
+          is_partnership?: boolean
           publication_revision?: number
           rejection_reason?: string | null
           reporter_id?: string
@@ -377,6 +625,9 @@ export type Database = {
           starts_on?: string | null
           status?: Database["public"]["Enums"]["discount_report_status"]
           store_name?: string
+          submitted_by_operator?: boolean
+          target_department_id?: string | null
+          target_university_id?: string | null
           updated_at?: string
           withdrawn_at?: string | null
         }
@@ -393,6 +644,20 @@ export type Database = {
             columns: ["reporter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_reports_target_department_id_fkey"
+            columns: ["target_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_reports_target_university_id_fkey"
+            columns: ["target_university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
             referencedColumns: ["id"]
           },
         ]
@@ -747,6 +1012,228 @@ export type Database = {
           p_reason?: string
         }
         Returns: undefined
+      }
+      request_business_operator: {
+        Args: { p_business: string; p_evidence: string; p_note: string }
+        Returns: undefined
+      }
+      review_business_operator: {
+        Args: { p_decision: string; p_request: string }
+        Returns: undefined
+      }
+      edit_owned_business: {
+        Args: {
+          p_business: string
+          p_description: string
+          p_hours: string
+          p_menu: string
+        }
+        Returns: undefined
+      }
+      submit_owned_business_offer: {
+        Args: {
+          p_business: string
+          p_details: string
+          p_end?: string
+          p_source: string
+          p_start?: string
+          p_title: string
+        }
+        Returns: string
+      }
+      create_discount_coupon: {
+        Args: {
+          p_business: string
+          p_end: string
+          p_quantity: number
+          p_school?: string
+          p_start: string
+          p_terms: string
+          p_title: string
+        }
+        Returns: string
+      }
+      set_discount_coupon_active: {
+        Args: { p_active: boolean; p_campaign: string }
+        Returns: undefined
+      }
+      list_business_coupons: {
+        Args: { p_business: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          active: boolean
+          claimed: boolean
+          ends_on: string
+          id: string
+          issued: number | null
+          remaining: number
+          school: string | null
+          starts_on: string
+          terms: string
+          title: string
+          used: number | null
+        }[]
+      }
+      claim_discount_coupon: { Args: { p_campaign: string }; Returns: string }
+      redeem_discount_coupon: {
+        Args: { p_business: string; p_code: string }
+        Returns: string
+      }
+      list_my_discount_coupons: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          business: string
+          code: string | null
+          ends_on: string
+          id: string
+          redeemed_at: string | null
+          terms: string
+          title: string
+          usable: boolean
+        }[]
+      }
+      my_discount_point_balance: { Args: never; Returns: number }
+      set_discount_offer_terms: {
+        Args: {
+          p_amount?: number
+          p_department?: string
+          p_from?: string
+          p_id: string
+          p_partner?: boolean
+          p_percent?: number
+          p_school?: string
+          p_until?: string
+        }
+        Returns: undefined
+      }
+      search_discount_catalog_ranked: {
+        Args: {
+          p_category?: Database["public"]["Enums"]["business_category"]
+          p_ending_soon?: boolean
+          p_limit?: number
+          p_now_only?: boolean
+          p_offset?: number
+          p_partner_only?: boolean
+          p_query?: string
+          p_region?: string
+          p_sort?: string
+          p_today_only?: boolean
+          p_university_id?: string
+        }
+        Returns: {
+          available_from: string | null
+          available_until: string | null
+          details: string
+          discount_amount: number | null
+          discount_percent: number | null
+          ends_on: string | null
+          id: string
+          is_partnership: boolean
+          source_url: string
+          starts_on: string | null
+          store_name: string
+          target_campus_id: string | null
+          target_department: string | null
+          target_department_id: string | null
+          target_school: string | null
+          target_university_id: string | null
+          verified_at: string
+        }[]
+      }
+      create_points_discount_coupon: {
+        Args: {
+          p_business: string
+          p_end: string
+          p_points_cost?: number
+          p_quantity: number
+          p_school?: string
+          p_start: string
+          p_terms: string
+          p_title: string
+        }
+        Returns: string
+      }
+      list_business_coupon_offers: {
+        Args: { p_business: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          active: boolean
+          claimed: boolean
+          ends_on: string
+          id: string
+          issued: number | null
+          points_cost: number
+          remaining: number
+          school: string | null
+          starts_on: string
+          terms: string
+          title: string
+          used: number | null
+        }[]
+      }
+      revoke_discount_reward: {
+        Args: { p_entry: string; p_reason: string }
+        Returns: undefined
+      }
+      list_discount_reward_grants: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          amount: number
+          awarded_at: string
+          id: string
+          label: string
+          reason: string | null
+          revoked_at: string | null
+        }[]
+      }
+      set_discount_business_coordinates: {
+        Args: { p_business: string; p_lat?: number; p_lng?: number }
+        Returns: undefined
+      }
+      search_discount_catalog_v2: {
+        Args: {
+          p_category?: Database["public"]["Enums"]["business_category"]
+          p_ending_soon?: boolean
+          p_lat?: number
+          p_limit?: number
+          p_lng?: number
+          p_now_only?: boolean
+          p_offset?: number
+          p_partner_only?: boolean
+          p_query?: string
+          p_region?: string
+          p_sort?: string
+          p_today_only?: boolean
+          p_university_id?: string
+        }
+        Returns: {
+          available_from: string | null
+          available_until: string | null
+          details: string
+          discount_amount: number | null
+          discount_percent: number | null
+          distance_m: number | null
+          ends_on: string | null
+          id: string
+          is_partnership: boolean
+          school_match: boolean
+          source_url: string
+          starts_on: string | null
+          store_name: string
+          target_campus_id: string | null
+          target_department: string | null
+          target_department_id: string | null
+          target_school: string | null
+          target_university_id: string | null
+          verified_at: string
+        }[]
+      }
+      manage_discount_business_photo: {
+        Args: {
+          p_actor: string
+          p_business: string
+          p_expected: string | null
+          p_path: string | null
+        }
+        Returns: boolean
       }
       review_discount_report: {
         Args: {
