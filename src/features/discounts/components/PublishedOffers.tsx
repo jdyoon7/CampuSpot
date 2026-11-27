@@ -8,6 +8,7 @@ import { BookmarkButton } from './BookmarkButton';
 import { ReportList } from './ReportList';
 import { OfferDetails } from './OfferDetails';
 import { CorrectionForm } from './CorrectionForm';
+import { CatalogFilters } from './CatalogFilters';
 
 const emptyFilters: SearchFilters = {
   query: '',
@@ -38,7 +39,12 @@ export function PublishedOffers({
     [applied, userId],
   );
   const hasFilters = Boolean(
-    applied.query || applied.todayOnly || applied.endingSoon,
+    applied.query ||
+    applied.todayOnly ||
+    applied.endingSoon ||
+    applied.university ||
+    applied.region ||
+    applied.category,
   );
   function reset() {
     setDraft(emptyFilters);
@@ -66,6 +72,16 @@ export function PublishedOffers({
           />
           <button type="submit">검색</button>
         </div>
+        <CatalogFilters
+          value={{
+            university: draft.university,
+            region: draft.region,
+            category: draft.category,
+          }}
+          onChange={(selection) =>
+            setDraft((current) => ({ ...current, ...selection }))
+          }
+        />
         <div className="discount-search-filters">
           <label>
             <input

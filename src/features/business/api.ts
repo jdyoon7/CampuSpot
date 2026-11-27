@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { AccountError, client } from '../../shared/auth/account';
 import type { ListPage } from '../discounts/components/ReportList';
 import { pageSize } from '../discounts/api/reports';
+import { businessCategory } from './categories';
 
 const businessFields = 'id,name,branch_name,address,source_url';
 const editInput = z.object({
@@ -17,7 +18,9 @@ export async function getBusiness(id: string) {
   if (!z.uuid().safeParse(id).success) return null;
   const { data, error } = await client()
     .from('businesses')
-    .select(businessFields)
+    .select(
+      'id,name,branch_name,address,source_url,nearby_university_id,region,category',
+    )
     .eq('id', id)
     .maybeSingle();
   if (error)
@@ -27,6 +30,46 @@ export async function getBusiness(id: string) {
       true,
     );
   return data;
+}
+
+const discoveryInput = z.object({
+  university: z.uuid().optional(),
+  region: z.string().trim().max(80),
+  category: businessCategory.optional(),
+});
+
+export async function saveBusinessDiscovery(
+  businessId: string,
+  university: string | null,
+  form: FormData,
+) {
+  const parsed = discoveryInput.safeParse({
+    university: university ?? undefined,
+    region: form.get('region'),
+    category: form.get('category') || undefined,
+  });
+  if (!parsed.success)
+    throw new AccountError(
+      'invalid_discovery',
+      '학교, 지역과 업종을 확인해 주세요.',
+    );
+  const { error } = await client().rpc('set_business_discovery', {
+    p_business_id: businessId,
+    p_university_id: parsed.data.university,
+    p_region: parsed.data.region || undefined,
+    p_category: parsed.data.category,
+  });
+  if (error?.code === '42501')
+    throw new AccountError(
+      'forbidden',
+      '관리자 계정에서만 분류를 수정할 수 있습니다.',
+    );
+  if (error)
+    throw new AccountError(
+      'discovery_failed',
+      '검색 분류를 저장하지 못했습니다.',
+      true,
+    );
 }
 
 export const businessName = (business: { name: string; branch_name: string }) =>

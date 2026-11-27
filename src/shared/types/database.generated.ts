@@ -90,9 +90,12 @@ export type Database = {
         Row: {
           address: string
           branch_name: string
+          category: Database["public"]["Enums"]["business_category"] | null
           created_at: string
           id: string
           name: string
+          nearby_university_id: string | null
+          region: string | null
           registered_by: string | null
           source_url: string
         }
@@ -100,22 +103,35 @@ export type Database = {
         Insert: {
           address: string
           branch_name: string
+          category?: Database["public"]["Enums"]["business_category"] | null
           created_at?: string
           id?: string
           name: string
+          nearby_university_id?: string | null
+          region?: string | null
           registered_by?: string | null
           source_url: string
         }
         Update: {
           address?: string
           branch_name?: string
+          category?: Database["public"]["Enums"]["business_category"] | null
           created_at?: string
           id?: string
           name?: string
+          nearby_university_id?: string | null
+          region?: string | null
           registered_by?: string | null
           source_url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "businesses_nearby_university_id_fkey"
+            columns: ["nearby_university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "businesses_registered_by_fkey"
             columns: ["registered_by"]
@@ -629,6 +645,14 @@ export type Database = {
           verified_at: string
         }[]
       }
+      list_discount_catalog_filters: {
+        Args: never
+        Returns: {
+          dimension: string
+          label: string
+          value: string
+        }[]
+      }
       list_my_business_notifications: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -725,6 +749,27 @@ export type Database = {
         }
         Returns: undefined
       }
+      search_discount_catalog: {
+        Args: {
+          p_category?: Database["public"]["Enums"]["business_category"]
+          p_ending_soon?: boolean
+          p_limit?: number
+          p_offset?: number
+          p_query?: string
+          p_region?: string
+          p_today_only?: boolean
+          p_university_id?: string
+        }
+        Returns: {
+          details: string
+          ends_on: string | null
+          id: string
+          source_url: string
+          starts_on: string | null
+          store_name: string
+          verified_at: string
+        }[]
+      }
       search_published_discounts: {
         Args: {
           p_ending_soon?: boolean
@@ -742,6 +787,15 @@ export type Database = {
           store_name: string
           verified_at: string
         }[]
+      }
+      set_business_discovery: {
+        Args: {
+          p_business_id: string
+          p_category?: Database["public"]["Enums"]["business_category"]
+          p_region?: string
+          p_university_id?: string
+        }
+        Returns: undefined
       }
       set_business_follow: {
         Args: { p_business_id: string; p_followed: boolean }
@@ -773,6 +827,14 @@ export type Database = {
         | "business_owner"
         | "admin"
         | "super_admin"
+      business_category:
+        | "food"
+        | "cafe"
+        | "retail"
+        | "culture"
+        | "health"
+        | "services"
+        | "other"
       business_notification_kind: "new_offer" | "starting" | "ending"
       discount_correction_kind: "edit" | "ended" | "incorrect"
       discount_report_status: "pending" | "approved" | "rejected"
@@ -910,6 +972,15 @@ export const Constants = {
         "business_owner",
         "admin",
         "super_admin",
+      ],
+      business_category: [
+        "food",
+        "cafe",
+        "retail",
+        "culture",
+        "health",
+        "services",
+        "other",
       ],
       business_notification_kind: ["new_offer", "starting", "ending"],
       discount_correction_kind: ["edit", "ended", "incorrect"],
