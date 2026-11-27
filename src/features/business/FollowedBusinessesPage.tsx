@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../shared/auth/useAuth';
 import { businessName } from './api';
 import { businessPath } from './BusinessDirectory';
+import { BusinessMapLink } from './BusinessMapLink';
 import { listFollowedBusinesses } from './follows';
 import { ReportList } from '../discounts/components/ReportList';
 
@@ -26,6 +27,10 @@ export function FollowedBusinessesPage() {
                 {businessName(item)}
               </Link>
               <p>{item.address}</p>
+              <BusinessMapLink
+                address={item.address}
+                name={businessName(item)}
+              />
             </>
           )}
         </ReportList>

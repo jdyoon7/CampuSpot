@@ -3,6 +3,7 @@ import { useAuth } from '../../shared/auth/useAuth';
 import { ActionForm } from '../auth/ActionForm';
 import { canReview } from '../discounts/api/review';
 import { ReportList } from '../discounts/components/ReportList';
+import { BusinessMapLink } from './BusinessMapLink';
 import { businessName, listBusinesses, registerBusiness } from './api';
 import '../discounts/discounts.css';
 
@@ -43,6 +44,10 @@ export function BusinessDirectory() {
                 {businessName(business)}
               </Link>
               <p>{business.address}</p>
+              <BusinessMapLink
+                address={business.address}
+                name={businessName(business)}
+              />
             </>
           )}
         </ReportList>

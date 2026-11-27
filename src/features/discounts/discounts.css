@@ -316,6 +316,16 @@
   column-gap: 1.25rem;
 }
 
+.discounts-page a.discount-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  margin-top: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
 .discount-bookmark {
   display: flex;
   align-items: center;
