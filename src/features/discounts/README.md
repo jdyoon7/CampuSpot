@@ -7,11 +7,21 @@
 | 6-5 신규 제보, 공식 SNS·공지 링크 | `DiscountsPage.tsx`, `components/ReportForm.tsx`, `api/reports.ts` | `npm run test:account` 안의 discounts-reports 시나리오 |
 | 6-2 기간·검수 상태와 본인 조회    | `components/MyReports.tsx`, discount_reports migration             | 제출 직후 pending. 내역은 최신순 20건씩 조회           |
 | 6-5 중복 및 권한                  | DB 제약, RLS, 컬럼별 INSERT 권한                                   | `npm run db:test` 안의 discounts_reports.test.sql      |
-| 포스터 첨부, 수정·종료 신고, 보상 | 후속 작업                                                          | 별도 단계에서 연결합니다.                              |
+| 제보 포인트 보상                  | 후속 작업                                                          | 별도 단계에서 연결합니다.                              |
 
 공통 인증 migration 다음에 `supabase/migrations/20261123073314_discounts_create_reports.sql`을 적용합니다. 테이블은 사용자 FK로 `profiles(id)`를 참조합니다. 접수 상태와 시각은 DB가 지정하고, 회원은 본인 명의 등록·본인 조회가 가능합니다. 동일 작성자의 매장명·할인 내용·출처·기간이 같은 검수 대기 제보는 중복 저장되지 않습니다. 가입 계정 삭제 시 해당 제보도 삭제됩니다.
 
 로컬 Supabase와 공개 키를 준비하는 순서는 [계정 개발 안내](../auth/README.md)에 있습니다. 기존 개발 DB에서는 `npx supabase migration up --local` 후 앱을 시작하세요. 혜택 제보는 추가 API 키가 필요하지 않습니다. `npm run check`, `npm run db:test`, `npm run test:account`가 각각 입력 검증, DB 권한, 실제 등록 화면을 검사합니다. 기능을 되돌릴 경우 UI 커밋을 revert하고 공유 DB에 접수된 제보는 보존합니다.
+
+## 증빙 사진과 혜택 지도
+
+**혜택 제보하기**에서 JPG·PNG 한 장을 선택할 수 있습니다. 사진은 브라우저에서 긴 변을 최대 1,200px로 줄인 뒤 PNG로 전송합니다. 서버가 파일을 다시 디코딩해 최대 2MB의 PNG로 저장하고 제보를 등록합니다. 등록에 실패하면 결과를 확인한 뒤 업로드를 정리합니다. 이미 접수된 제보의 사진은 **내 제보**에서 열 수 있습니다. 검수 담당자는 검수 대기 상태의 사진을 볼 수 있습니다.
+
+`20261127031600_discounts_map_and_evidence.sql`이 비공개 `discount-evidence` 버킷과 읽기 정책을 추가합니다. 공개 혜택에서는 증빙 자료를 조회하지 않습니다. 새 환경에는 마이그레이션을 먼저 적용하고 `discount-evidence` 함수와 탈퇴 시 사진을 정리하는 `core-account` 변경을 함께 반영합니다. 로컬 Supabase에서 검증할 때는 `supabase functions serve`로 두 함수를 실행합니다.
+
+**할인·혜택 → 혜택 지도**는 공개 중인 혜택이 연결된 지점만 20곳씩 표시합니다. `.env.local`의 `VITE_KAKAO_MAP_APP_KEY`에는 카카오 JavaScript 키를 넣고 해당 키에 앱 도메인을 등록합니다. 키가 없거나 매장 위치를 찾지 못한 경우에도 목록의 주소와 외부 카카오맵 링크를 이용할 수 있습니다. [카카오 지도 Web API 가이드](https://apis.map.kakao.com/web/guide/)
+
+공유 개발 DB에 마이그레이션을 적용했습니다. `npm run check`, 모바일 E2E 4개, 롤백 SQL 검사 10개와 Deno 타입 검사를 통과했습니다. 로컬 함수를 개발용 Auth·Storage에 연결해 사진 등록, 작성자·검수자 열람, 비인가 차단을 확인했습니다. 지도 핀은 SDK 모의 응답으로 검증했습니다. 공유 개발 프로젝트의 함수 배포와 실 카카오 JavaScript 키 연결은 별도 설정입니다.
 
 ## 관리자 검수
 

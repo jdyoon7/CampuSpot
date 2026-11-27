@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { errorFor } from '../../../shared/auth/account';
+import { submitReportWithEvidence } from '../api/evidence';
 import { submitReport } from '../api/reports';
 import { reportSchema } from '../schemas/report';
 
@@ -19,9 +20,9 @@ export function ReportForm({
     e.preventDefault();
     if (!userId || sending.current) return;
     const form = e.currentTarget;
-    const parsed = reportSchema.safeParse(
-      Object.fromEntries(new FormData(form)),
-    );
+    const formData = new FormData(form);
+    const photo = formData.get('image');
+    const parsed = reportSchema.safeParse(Object.fromEntries(formData));
     setSuccess('');
     setError('');
     if (!parsed.success) {
@@ -31,7 +32,11 @@ export function ReportForm({
     sending.current = true;
     setBusy(true);
     try {
-      await submitReport(userId, parsed.data);
+      if (photo instanceof File && photo.name) {
+        await submitReportWithEvidence(parsed.data, photo);
+      } else {
+        await submitReport(userId, parsed.data);
+      }
       form.reset();
       setPeriod('fixed');
       setSuccess('제보를 접수했습니다. 현재 검수 대기 중입니다.');
@@ -116,6 +121,18 @@ export function ReportForm({
         </label>
         <small id="source-help">
           매장이나 학생회에서 올린 공지 주소를 입력해 주세요.
+        </small>
+        <label>
+          증빙 사진 (선택)
+          <input
+            name="image"
+            type="file"
+            accept="image/jpeg,image/png"
+            aria-describedby="evidence-help"
+          />
+        </label>
+        <small id="evidence-help">
+          JPG·PNG 한 장. 제보자와 검수 담당자만 볼 수 있어요.
         </small>
         <button type="submit">{busy ? '접수 중…' : '제보 등록'}</button>
       </fieldset>

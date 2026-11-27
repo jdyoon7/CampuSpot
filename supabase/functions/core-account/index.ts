@@ -102,6 +102,18 @@ Deno.serve(async (req) => {
       if ((await bucket.remove([path])).error) return reply(503, 'storage');
       if ((await server.auth.admin.deleteUser(user.id)).error)
         return reply(503, 'delete_failed');
+      // The report FK cascades on account deletion. Remove its private objects
+      // separately through the Storage API so bytes are removed as well.
+      const evidence = server.storage.from('discount-evidence');
+      while (true) {
+        const { data: files, error } = await evidence.list(user.id, {
+          limit: 100,
+        });
+        if (error || !files.length) break;
+        const paths = files.map((file) => user.id + '/' + file.name);
+        const removed = await evidence.remove(paths);
+        if (removed.error || !removed.data.length) break;
+      }
       return reply(200, 'deleted');
     }
     if (data?.action !== 'school-email' || typeof data.email !== 'string')

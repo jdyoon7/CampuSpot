@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { formatKoreanDate } from '../../../shared/lib/date';
 import { listReports, statusLabels } from '../api/reports';
 import { OfferDetails } from './OfferDetails';
+import { ReportPhoto } from './ReportPhoto';
 import { ReportList } from './ReportList';
 
 export function MyReports({ userId }: { userId: string }) {
@@ -18,6 +19,7 @@ export function MyReports({ userId }: { userId: string }) {
             <span>{r.withdrawn_at ? '공개 중단' : statusLabels[r.status]}</span>
           </div>
           <OfferDetails offer={r} />
+          {r.photo && <ReportPhoto path={r.photo} />}
           <small>{formatKoreanDate(r.created_at)} 접수</small>
           {r.status === 'rejected' && r.rejection_reason && (
             <p className="discount-review-reason">

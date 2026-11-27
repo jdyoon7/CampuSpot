@@ -1,3 +1,4 @@
+import { withEvidence } from './evidence';
 import { AccountError, client } from '../../../shared/auth/account';
 import type { Database } from '../../../shared/types/database.generated';
 import type { ReportInput } from '../schemas/report';
@@ -67,5 +68,8 @@ export async function listReports(userId: string, page: number) {
     .order('id', { ascending: false })
     .range(start, start + pageSize);
   if (error) throw reportError(error.code);
-  return { items: data.slice(0, pageSize), hasNext: data.length > pageSize };
+  return {
+    items: await withEvidence(data.slice(0, pageSize)),
+    hasNext: data.length > pageSize,
+  };
 }

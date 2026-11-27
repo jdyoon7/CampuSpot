@@ -645,6 +645,23 @@ export type Database = {
           verified_at: string
         }[]
       }
+      list_discount_evidence: {
+        Args: { p_report_ids: string[] };
+        Returns: {
+          report_id: string;
+          object_path: string;
+        }[];
+      };
+      list_discount_map_businesses: {
+        Args: { p_limit?: number; p_offset?: number };
+        Returns: {
+          id: string;
+          name: string;
+          branch_name: string;
+          address: string;
+          offer_count: number;
+        }[];
+      };
       list_discount_catalog_filters: {
         Args: never
         Returns: {

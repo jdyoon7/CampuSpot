@@ -7,11 +7,13 @@ import {
   BusinessDirectory,
   RegisterBusinessPage,
 } from '../business/BusinessDirectory';
+import { DiscountMapPage } from '../business/DiscountMapPage';
 import { BusinessDetail } from '../business/BusinessDetail';
 import { FollowedBusinessesPage } from '../business/FollowedBusinessesPage';
 import { BusinessAlertsPage } from '../notifications/BusinessAlertsPage';
 export const discountsRoutes = (
   <>
+    <Route path="/discounts/map" element={<DiscountMapPage />} />
     <Route path="/discounts/review" element={<ReviewPage />} />
     <Route path="/discounts/calendar" element={<CalendarPage />} />
     <Route path="/discounts/saved" element={<BookmarksPage />} />

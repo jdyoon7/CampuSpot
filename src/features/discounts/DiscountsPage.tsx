@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Bookmark, CalendarDays, Store } from 'lucide-react';
+import { Bell, Bookmark, CalendarDays, MapPin, Store } from 'lucide-react';
 import { useAuth } from '../../shared/auth/useAuth';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
@@ -25,6 +25,9 @@ export default function DiscountsPage() {
           </Link>
           <Link className="discount-calendar-link" to="/discounts/saved">
             <Bookmark size={18} aria-hidden="true" /> 저장한 혜택
+          </Link>
+          <Link className="discount-calendar-link" to="/discounts/map">
+            <MapPin size={18} aria-hidden="true" /> 혜택 지도
           </Link>
           <Link className="discount-calendar-link" to="/discounts/business">
             <Store size={18} aria-hidden="true" /> 매장·지점

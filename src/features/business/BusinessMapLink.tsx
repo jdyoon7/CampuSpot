@@ -1,4 +1,5 @@
 import { MapPin } from 'lucide-react';
+import { businessMapQuery } from './mapQuery';
 
 export function BusinessMapLink({
   address,
@@ -7,14 +8,13 @@ export function BusinessMapLink({
   address: string;
   name: string;
 }) {
-  // Campus addresses can share the same street number. Use the building
-  // name when the address includes one, leaving the floor in the on-page address.
-  const building = address.match(/,\s*(.+?)\s+(?:지하\s*)?\d+\s*층\s*$/)?.[1];
-  const search = building ?? address.trim();
   return (
     <a
       className="discount-map-link"
-      href={'https://map.kakao.com/link/search/' + encodeURIComponent(search)}
+      href={
+        'https://map.kakao.com/link/search/' +
+        encodeURIComponent(businessMapQuery(address))
+      }
       target="_blank"
       rel="noreferrer"
       aria-label={`${name} 카카오맵에서 보기 (새 창)`}

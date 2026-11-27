@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { withEvidence } from './evidence';
 import { AccountError, client } from '../../../shared/auth/account';
 import type { Database } from '../../../shared/types/database.generated';
 import { pageSize } from './reports';
@@ -24,7 +25,10 @@ export async function loadQueue(userId: string, page: number) {
       '검수 목록을 불러오지 못했습니다.',
       true,
     );
-  return { items: data.slice(0, pageSize), hasNext: data.length > pageSize };
+  return {
+    items: await withEvidence(data.slice(0, pageSize)),
+    hasNext: data.length > pageSize,
+  };
 }
 export type PendingReport = Awaited<
   ReturnType<typeof loadQueue>
