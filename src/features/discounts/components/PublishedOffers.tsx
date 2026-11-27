@@ -25,13 +25,17 @@ export function PublishedOffers({
   onCorrectionSaved,
   userId,
   canEdit,
+  hasSchool,
 }: {
   onCorrectionSaved: () => void;
   userId?: string;
   canEdit?: boolean;
+  hasSchool?: boolean;
 }) {
   const [draft, setDraft] = useState(emptyFilters);
   const [notice, setNotice] = useState('');
+  const [locationError, setLocationError] = useState('');
+  const [locating, setLocating] = useState(false);
   const [{ filters: applied, revision }, setSearch] = useState({
     filters: emptyFilters,
     revision: 0,
@@ -56,7 +60,38 @@ export function PublishedOffers({
     applied.nowOnly ||
     applied.partnerOnly,
   );
+  function runSearch() {
+    setNotice('');
+    setLocationError('');
+    const filters = { ...draft, query: draft.query.trim() };
+    if (filters.sort !== 'distance') {
+      apply(filters);
+      return;
+    }
+    if (!navigator.geolocation) {
+      setLocationError('이 브라우저에서 현재 위치를 확인할 수 없습니다.');
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        apply({
+          ...filters,
+          origin: { lat: coords.latitude, lng: coords.longitude },
+        });
+        setLocating(false);
+      },
+      () => {
+        setLocationError(
+          '거리순으로 보려면 브라우저에서 위치 권한을 허용해 주세요.',
+        );
+        setLocating(false);
+      },
+      { timeout: 8000, maximumAge: 60000 },
+    );
+  }
   function reset() {
+    setLocationError('');
     setDraft(emptyFilters);
     apply(emptyFilters);
   }
@@ -68,8 +103,7 @@ export function PublishedOffers({
         className="discount-search"
         onSubmit={(e) => {
           e.preventDefault();
-          setNotice('');
-          apply({ ...draft, query: draft.query.trim() });
+          if (!locating) runSearch();
         }}
       >
         <label htmlFor="benefit-search">매장명 또는 할인 내용</label>
@@ -81,7 +115,9 @@ export function PublishedOffers({
             value={draft.query}
             onChange={(e) => setDraft({ ...draft, query: e.target.value })}
           />
-          <button type="submit">검색</button>
+          <button type="submit" disabled={locating}>
+            {locating ? '위치 확인 중…' : '검색'}
+          </button>
         </div>
         <CatalogFilters
           value={{
@@ -107,6 +143,8 @@ export function PublishedOffers({
               <option value="percent">할인율 높은순</option>
               <option value="amount">할인 금액 높은순</option>
               <option value="popular">저장 많은순</option>
+              <option value="distance">거리 가까운순</option>
+              {hasSchool && <option value="recommended">내 학교 추천순</option>}
             </select>
           </label>
           <label>
@@ -149,11 +187,12 @@ export function PublishedOffers({
             />
             마감 임박 (7일 이내)
           </label>
-          <button type="button" onClick={reset}>
+          <button type="button" onClick={reset} disabled={locating}>
             초기화
           </button>
         </div>
       </form>
+      {locationError && <p role="alert">{locationError}</p>}
       {notice && <p role="status">{notice}</p>}
       <ReportList
         key={(userId ?? 'guest') + '-' + revision}
@@ -186,6 +225,16 @@ export function PublishedOffers({
               </p>
             )}
             {offer.is_partnership && <small>공식 제휴</small>}
+            {offer.school_match && <p>내 학교 맞춤 추천</p>}
+            {applied.sort === 'distance' && (
+              <p>
+                {offer.distance_m === null
+                  ? '거리 정보 없음'
+                  : offer.distance_m < 1000
+                    ? `${offer.distance_m}m`
+                    : `${(offer.distance_m / 1000).toFixed(1)}km`}
+              </p>
+            )}
             {canEdit && (
               <OfferTermsForm
                 offer={offer}

@@ -3,7 +3,14 @@ import { AccountError, client } from '../../../shared/auth/account';
 import { pageSize } from './reports';
 import { businessCategory } from '../../business/categories';
 
-export const discountSort = z.enum(['recent', 'percent', 'amount', 'popular']);
+export const discountSort = z.enum([
+  'recent',
+  'percent',
+  'amount',
+  'popular',
+  'distance',
+  'recommended',
+]);
 
 const searchInput = z.object({
   query: z.string().trim().max(100),
@@ -12,6 +19,12 @@ const searchInput = z.object({
   nowOnly: z.boolean().optional(),
   partnerOnly: z.boolean().optional(),
   sort: discountSort.optional(),
+  origin: z
+    .object({
+      lat: z.number().min(-90).max(90),
+      lng: z.number().min(-180).max(180),
+    })
+    .optional(),
   university: z.uuid().optional(),
   region: z.string().trim().min(1).max(80).optional(),
   category: businessCategory.optional(),
@@ -34,8 +47,9 @@ export async function searchPublished(filters: SearchFilters, page: number) {
     nowOnly,
     partnerOnly,
     sort,
+    origin,
   } = parsed.data;
-  const { data, error } = await client().rpc('search_discount_catalog_ranked', {
+  const { data, error } = await client().rpc('search_discount_catalog_v2', {
     p_query: query,
     p_today_only: todayOnly,
     p_ending_soon: endingSoon,
@@ -47,6 +61,8 @@ export async function searchPublished(filters: SearchFilters, page: number) {
     p_now_only: nowOnly,
     p_partner_only: partnerOnly,
     p_sort: sort,
+    p_lat: origin?.lat,
+    p_lng: origin?.lng,
   });
   if (error)
     throw new AccountError(

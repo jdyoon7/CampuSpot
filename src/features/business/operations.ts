@@ -14,6 +14,7 @@ export function operationResult<T>(
     '22023': '입력값을 확인해 주세요.',
     '22P02': '입력한 코드 형식을 확인해 주세요.',
     '55000': '이미 처리됐거나 발급 한도·사용 기간이 지난 항목입니다.',
+    P0001: '쿠폰을 받기에 포인트가 부족합니다.',
     P0002: '대상이 없거나 이미 처리됐습니다.',
   };
   throw new AccountError(code, dictionary[code] ?? failure, !dictionary[code]);
@@ -25,7 +26,7 @@ export function textField(form: FormData, key: string) {
 
 export async function listBusinessCoupons(businessId: string, page: number) {
   const data = operationResult(
-    await client().rpc('list_business_coupons', {
+    await client().rpc('list_business_coupon_offers', {
       p_business: businessId,
       p_limit: pageSize + 1,
       p_offset: page * pageSize,

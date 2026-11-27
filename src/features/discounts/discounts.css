@@ -406,3 +406,12 @@
   user-select: all;
   overflow-wrap: anywhere;
 }
+
+.discount-business-photo {
+  display: block;
+  inline-size: 100%;
+  max-block-size: 25rem;
+  object-fit: contain;
+  margin-block-end: 1rem;
+  border-radius: 0.65rem;
+}

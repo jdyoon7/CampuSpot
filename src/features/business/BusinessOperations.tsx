@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client, errorFor } from '../../shared/auth/account';
 import { ActionForm } from '../auth/ActionForm';
+import { BusinessPhotoEditor } from './BusinessPhoto';
 import { SchoolSelect } from '../auth/SchoolSelect';
 import { ReportList } from '../discounts/components/ReportList';
 import {
@@ -16,6 +17,7 @@ type Business = {
   description: string | null;
   opening_hours: string | null;
   menu_url: string | null;
+  photo_path: string | null;
 };
 const labels: Record<string, string> = {
   pending: '운영자 신청 검수 대기 중',
@@ -76,6 +78,11 @@ function OperatorTools({
           />
         </label>
       </ActionForm>
+      <BusinessPhotoEditor
+        businessId={business.id}
+        path={business.photo_path}
+        onChanged={refresh}
+      />
       <h3>할인 등록</h3>
       <ActionForm
         label="할인 검수 요청"
@@ -120,13 +127,14 @@ function OperatorTools({
         label="쿠폰 캠페인 만들기"
         submit={async (form) => {
           operationResult(
-            await client().rpc('create_discount_coupon', {
+            await client().rpc('create_points_discount_coupon', {
               p_business: business.id,
               p_title: textField(form, 'title'),
               p_terms: textField(form, 'terms'),
               p_start: textField(form, 'start'),
               p_end: textField(form, 'end'),
               p_quantity: Number(form.get('quantity')),
+              p_points_cost: Number(form.get('points') ?? 0),
               p_school: school ?? undefined,
             }),
             '쿠폰을 만들지 못했습니다.',
@@ -154,6 +162,17 @@ function OperatorTools({
         <label>
           발급 수량
           <input name="quantity" type="number" min={1} max={10000} required />
+        </label>
+        <label>
+          쿠폰 발급에 필요한 포인트
+          <input
+            name="points"
+            type="number"
+            min={0}
+            max={100000}
+            defaultValue={0}
+            required
+          />
         </label>
         <SchoolSelect
           label="쿠폰 대상 학교 (선택)"
@@ -295,6 +314,9 @@ export function BusinessOperations({
               {coupon.starts_on} ~ {coupon.ends_on} ·{' '}
               {coupon.school ? coupon.school + ' 인증 회원' : '모든 회원'}
             </p>
+            {coupon.points_cost > 0 && (
+              <p>발급 시 {coupon.points_cost.toLocaleString('ko-KR')}P 차감</p>
+            )}
             {owner && (
               <p>
                 발급 {coupon.issued}건 · 사용 {coupon.used}건
@@ -321,7 +343,11 @@ export function BusinessOperations({
               <Link to="/me">쿠폰을 받으려면 로그인</Link>
             ) : coupon.remaining > 0 ? (
               <ActionForm
-                label="쿠폰 받기"
+                label={
+                  coupon.points_cost > 0
+                    ? `${coupon.points_cost.toLocaleString('ko-KR')}P 사용해 쿠폰 받기`
+                    : '쿠폰 받기'
+                }
                 submit={async () => {
                   operationResult(
                     await client().rpc('claim_discount_coupon', {

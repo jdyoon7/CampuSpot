@@ -77,6 +77,13 @@ export default function DiscountsPage() {
         <PublishedOffers
           userId={userId}
           canEdit={state.status === 'ready' && canReview(state.account.roles)}
+          hasSchool={
+            state.status === 'ready' &&
+            Boolean(
+              state.account.verifiedUniversityId ??
+              state.account.profile.university_id,
+            )
+          }
           onCorrectionSaved={() => setCorrectionRevision((n) => n + 1)}
         />
       )}

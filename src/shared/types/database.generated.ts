@@ -94,10 +94,13 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           menu_url: string | null
           name: string
           nearby_university_id: string | null
           opening_hours: string | null
+          photo_path: string | null
           region: string | null
           registered_by: string | null
           source_url: string
@@ -109,10 +112,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           menu_url?: string | null
           name: string
           nearby_university_id?: string | null
           opening_hours?: string | null
+          photo_path?: string | null
           region?: string | null
           registered_by?: string | null
           source_url: string
@@ -124,10 +130,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           menu_url?: string | null
           name?: string
           nearby_university_id?: string | null
           opening_hours?: string | null
+          photo_path?: string | null
           region?: string | null
           registered_by?: string | null
           source_url?: string
@@ -215,6 +224,7 @@ export type Database = {
           ends_on: string
           id: string
           issued_count: number
+          points_cost: number
           quantity: number
           redeemed_count: number
           starts_on: string
@@ -229,6 +239,7 @@ export type Database = {
           ends_on: string
           id?: string
           issued_count?: number
+          points_cost?: number
           quantity: number
           redeemed_count?: number
           starts_on: string
@@ -243,6 +254,7 @@ export type Database = {
           ends_on?: string
           id?: string
           issued_count?: number
+          points_cost?: number
           quantity?: number
           redeemed_count?: number
           starts_on?: string
@@ -311,6 +323,8 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          memo: string | null
+          performed_by: string | null
           reward_key: string
           source: string
           source_id: string
@@ -320,6 +334,8 @@ export type Database = {
           amount: number
           created_at?: string
           id?: string
+          memo?: string | null
+          performed_by?: string | null
           reward_key: string
           source: string
           source_id: string
@@ -329,12 +345,21 @@ export type Database = {
           amount?: number
           created_at?: string
           id?: string
+          memo?: string | null
+          performed_by?: string | null
           reward_key?: string
           source?: string
           source_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "point_ledger_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "point_ledger_user_id_fkey"
             columns: ["user_id"]
@@ -1113,6 +1138,102 @@ export type Database = {
           target_university_id: string | null
           verified_at: string
         }[]
+      }
+      create_points_discount_coupon: {
+        Args: {
+          p_business: string
+          p_end: string
+          p_points_cost?: number
+          p_quantity: number
+          p_school?: string
+          p_start: string
+          p_terms: string
+          p_title: string
+        }
+        Returns: string
+      }
+      list_business_coupon_offers: {
+        Args: { p_business: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          active: boolean
+          claimed: boolean
+          ends_on: string
+          id: string
+          issued: number | null
+          points_cost: number
+          remaining: number
+          school: string | null
+          starts_on: string
+          terms: string
+          title: string
+          used: number | null
+        }[]
+      }
+      revoke_discount_reward: {
+        Args: { p_entry: string; p_reason: string }
+        Returns: undefined
+      }
+      list_discount_reward_grants: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          amount: number
+          awarded_at: string
+          id: string
+          label: string
+          reason: string | null
+          revoked_at: string | null
+        }[]
+      }
+      set_discount_business_coordinates: {
+        Args: { p_business: string; p_lat?: number; p_lng?: number }
+        Returns: undefined
+      }
+      search_discount_catalog_v2: {
+        Args: {
+          p_category?: Database["public"]["Enums"]["business_category"]
+          p_ending_soon?: boolean
+          p_lat?: number
+          p_limit?: number
+          p_lng?: number
+          p_now_only?: boolean
+          p_offset?: number
+          p_partner_only?: boolean
+          p_query?: string
+          p_region?: string
+          p_sort?: string
+          p_today_only?: boolean
+          p_university_id?: string
+        }
+        Returns: {
+          available_from: string | null
+          available_until: string | null
+          details: string
+          discount_amount: number | null
+          discount_percent: number | null
+          distance_m: number | null
+          ends_on: string | null
+          id: string
+          is_partnership: boolean
+          school_match: boolean
+          source_url: string
+          starts_on: string | null
+          store_name: string
+          target_campus_id: string | null
+          target_department: string | null
+          target_department_id: string | null
+          target_school: string | null
+          target_university_id: string | null
+          verified_at: string
+        }[]
+      }
+      manage_discount_business_photo: {
+        Args: {
+          p_actor: string
+          p_business: string
+          p_expected: string | null
+          p_path: string | null
+        }
+        Returns: boolean
       }
       review_discount_report: {
         Args: {

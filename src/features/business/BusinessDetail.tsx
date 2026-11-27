@@ -20,6 +20,7 @@ import {
 import { businessPath } from './BusinessDirectory';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { BusinessDiscovery } from './BusinessDiscovery';
+import { BusinessPhoto } from './BusinessPhoto';
 import { BusinessOperations } from './BusinessOperations';
 import { BusinessMapLink } from './BusinessMapLink';
 import { businessCategoryLabels } from './categories';
@@ -226,6 +227,13 @@ export function BusinessDetail() {
         <p>등록된 매장을 찾을 수 없습니다.</p>
       ) : (
         <>
+          {business.photo_path && (
+            <BusinessPhoto
+              key={business.photo_path}
+              path={business.photo_path}
+              name={businessName(business)}
+            />
+          )}
           <p>{business.address}</p>
           {(business.region || business.category) && (
             <p>

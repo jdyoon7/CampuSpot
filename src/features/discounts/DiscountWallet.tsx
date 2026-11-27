@@ -21,7 +21,7 @@ async function loadPoints(page: number) {
   const data = operationResult(
     await client()
       .from('point_ledger')
-      .select('id,amount,created_at')
+      .select('id,source,amount,memo,created_at')
       .order('created_at', { ascending: false })
       .order('id')
       .range(page * pageSize, (page + 1) * pageSize),
@@ -67,6 +67,9 @@ function WalletContents() {
             ? '포인트 조회 중'
             : `보유 포인트 ${balance.toLocaleString('ko-KR')}P`}
         </p>
+      )}
+      {balance !== undefined && balance < 0 && (
+        <p>회수된 포인트는 이후 적립분에서 차감됩니다.</p>
       )}
       <button
         type="button"
@@ -114,8 +117,15 @@ function WalletContents() {
       >
         {(entry) => (
           <p>
-            혜택 제보 승인 · +{entry.amount.toLocaleString('ko-KR')}P ·{' '}
+            {entry.source === 'coupon_spend'
+              ? '쿠폰 발급'
+              : entry.source === 'reward_revoke'
+                ? '제보 보상 회수'
+                : '혜택 제보 승인'}{' '}
+            · {entry.amount > 0 ? '+' : ''}
+            {entry.amount.toLocaleString('ko-KR')}P ·{' '}
             {formatTime.format(new Date(entry.created_at))}
+            {entry.memo && <span> · {entry.memo}</span>}
           </p>
         )}
       </ReportList>
