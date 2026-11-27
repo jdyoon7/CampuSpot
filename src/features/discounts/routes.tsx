@@ -8,6 +8,8 @@ import {
   RegisterBusinessPage,
 } from '../business/BusinessDirectory';
 import { BusinessDetail } from '../business/BusinessDetail';
+import { FollowedBusinessesPage } from '../business/FollowedBusinessesPage';
+import { BusinessAlertsPage } from '../notifications/BusinessAlertsPage';
 export const discountsRoutes = (
   <>
     <Route path="/discounts/review" element={<ReviewPage />} />
@@ -16,9 +18,14 @@ export const discountsRoutes = (
     <Route path="/discounts/business" element={<BusinessDirectory />} />
     <Route path="/discounts/business/new" element={<RegisterBusinessPage />} />
     <Route
+      path="/discounts/business/following"
+      element={<FollowedBusinessesPage />}
+    />
+    <Route
       path="/discounts/business/:businessId"
       element={<BusinessDetail />}
     />
+    <Route path="/discounts/notifications" element={<BusinessAlertsPage />} />
     <Route path="/discounts/*" element={<DiscountsPage />} />
   </>
 );

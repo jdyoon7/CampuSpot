@@ -9,6 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      business_follows: {
+        Row: {
+          business_id: string
+          created_at: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          business_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_follows_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_notification_reads: {
+        Row: {
+          business_id: string
+          event_at: string
+          kind: Database["public"]["Enums"]["business_notification_kind"]
+          offer_id: string
+          read_at: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          business_id: string
+          event_at: string
+          kind: Database["public"]["Enums"]["business_notification_kind"]
+          offer_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          event_at?: string
+          kind?: Database["public"]["Enums"]["business_notification_kind"]
+          offer_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_notification_reads_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "discount_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_notification_reads_user_id_business_id_fkey"
+            columns: ["user_id", "business_id"]
+            isOneToOne: false
+            referencedRelation: "business_follows"
+            referencedColumns: ["user_id", "business_id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           address: string
@@ -232,6 +309,7 @@ export type Database = {
         Row: {
           available_weekdays: number[] | null
           business_id: string | null
+          business_linked_at: string | null
           created_at: string
           details: string
           ends_on: string | null
@@ -251,6 +329,7 @@ export type Database = {
         Insert: {
           available_weekdays?: number[] | null
           business_id?: string | null
+          business_linked_at?: string | null
           created_at?: string
           details: string
           ends_on?: string | null
@@ -269,6 +348,7 @@ export type Database = {
         Update: {
           available_weekdays?: number[] | null
           business_id?: string | null
+          business_linked_at?: string | null
           created_at?: string
           details?: string
           ends_on?: string | null
@@ -549,6 +629,21 @@ export type Database = {
           verified_at: string
         }[]
       }
+      list_my_business_notifications: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          branch_name: string
+          business_id: string
+          ends_on: string | null
+          event_at: string
+          kind: Database["public"]["Enums"]["business_notification_kind"]
+          name: string
+          offer_id: string
+          read_at: string | null
+          starts_on: string | null
+          store_name: string
+        }[]
+      }
       list_my_discount_offer_bookmarks: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -559,6 +654,15 @@ export type Database = {
           source_url: string | null
           starts_on: string | null
           store_name: string
+        }[]
+      }
+      list_my_followed_businesses: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          address: string
+          branch_name: string
+          id: string
+          name: string
         }[]
       }
       list_public_discount_business_links: {
@@ -581,6 +685,15 @@ export type Database = {
           store_name: string
           verified_at: string
         }[]
+      }
+      mark_business_notification_read: {
+        Args: {
+          p_business_id: string
+          p_event_at: string
+          p_kind: Database["public"]["Enums"]["business_notification_kind"]
+          p_offer_id: string
+        }
+        Returns: undefined
       }
       my_verified_university: {
         Args: Record<PropertyKey, never>
@@ -630,6 +743,10 @@ export type Database = {
           verified_at: string
         }[]
       }
+      set_business_follow: {
+        Args: { p_business_id: string; p_followed: boolean }
+        Returns: undefined
+      }
       set_discount_business_link: {
         Args: { p_business_id: string; p_linked: boolean; p_offer_id: string }
         Returns: undefined
@@ -656,6 +773,7 @@ export type Database = {
         | "business_owner"
         | "admin"
         | "super_admin"
+      business_notification_kind: "new_offer" | "starting" | "ending"
       discount_correction_kind: "edit" | "ended" | "incorrect"
       discount_report_status: "pending" | "approved" | "rejected"
     }
@@ -793,6 +911,7 @@ export const Constants = {
         "admin",
         "super_admin",
       ],
+      business_notification_kind: ["new_offer", "starting", "ending"],
       discount_correction_kind: ["edit", "ended", "incorrect"],
       discount_report_status: ["pending", "approved", "rejected"],
     },

@@ -15,9 +15,19 @@ export function BusinessDirectory() {
       <header>
         <Link to="/discounts">← 할인·혜택</Link>
         <h1>매장·지점</h1>
-        {state.status === 'ready' && canReview(state.account.roles) && (
-          <Link to={businessPath + '/new'}>매장·지점 등록</Link>
-        )}
+        <div className="discount-utility-links">
+          <Link
+            className="discount-calendar-link"
+            to={businessPath + '/following'}
+          >
+            관심 매장
+          </Link>
+          {state.status === 'ready' && canReview(state.account.roles) && (
+            <Link className="discount-calendar-link" to={businessPath + '/new'}>
+              매장·지점 등록
+            </Link>
+          )}
+        </div>
       </header>
       {state.status === 'unconfigured' ? (
         <p role="status">혜택 서비스 연결 후 매장을 조회할 수 있습니다.</p>

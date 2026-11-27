@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bookmark, CalendarDays, Store } from 'lucide-react';
+import { Bell, Bookmark, CalendarDays, Store } from 'lucide-react';
 import { useAuth } from '../../shared/auth/useAuth';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
@@ -28,6 +28,12 @@ export default function DiscountsPage() {
           </Link>
           <Link className="discount-calendar-link" to="/discounts/business">
             <Store size={18} aria-hidden="true" /> 매장·지점
+          </Link>
+          <Link
+            className="discount-calendar-link"
+            to="/discounts/notifications"
+          >
+            <Bell size={18} aria-hidden="true" /> 혜택 알림
           </Link>
         </div>
       </header>
@@ -65,10 +71,12 @@ export default function DiscountsPage() {
         userId={userId}
         onSaved={() => setRevision((v) => v + 1)}
       />
-      {userId && <MyReports key={userId + '-' + revision} userId={userId} />}
+      {userId && (
+        <MyReports key={`reports-${userId}-${revision}`} userId={userId} />
+      )}
       {userId && (
         <MyCorrections
-          key={userId + '-' + correctionRevision}
+          key={`corrections-${userId}-${correctionRevision}`}
           userId={userId}
         />
       )}
