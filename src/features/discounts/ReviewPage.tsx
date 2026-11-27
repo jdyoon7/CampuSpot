@@ -225,6 +225,11 @@ export function ReviewPage() {
           제보 포인트 검수
         </Link>
       )}
+      {state.status === 'ready' && canReview(state.account.roles) && (
+        <Link className="discount-review-link" to="/discounts/review/schedules">
+          매장 할인 일정 검수
+        </Link>
+      )}
       {state.status === 'ready' &&
         (canReview(state.account.roles) ? (
           <ReviewQueue key={state.user.id} userId={state.user.id} />

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { errorFor } from '../../shared/auth/account';
+import { client, errorFor } from '../../shared/auth/account';
 import { useAuth } from '../../shared/auth/useAuth';
 import { supabase } from '../../shared/lib/supabase';
 import { ActionForm } from '../auth/ActionForm';
@@ -168,6 +168,20 @@ function BusinessOffers({ businessId }: { businessId: string }) {
   );
 }
 
+async function recordBusinessEvent(
+  businessId: string,
+  kind: 'view' | 'official_click',
+) {
+  try {
+    await client().rpc('record_discount_business_event', {
+      p_business: businessId,
+      p_kind: kind,
+    });
+  } catch {
+    // Reporting is optional; the detail page and official link remain available.
+  }
+}
+
 export function BusinessDetail() {
   const { state } = useAuth();
   const { businessId = '' } = useParams();
@@ -199,6 +213,11 @@ export function BusinessDetail() {
   }, [attempt, businessId]);
   const current = result?.id === businessId ? result : undefined;
   const business = current?.data;
+  const viewedId = business?.id;
+  const viewerId = state.status === 'ready' ? state.user.id : undefined;
+  useEffect(() => {
+    if (viewedId && viewerId) void recordBusinessEvent(viewedId, 'view');
+  }, [viewedId, viewerId]);
 
   return (
     <article className="discounts-page">
@@ -252,6 +271,10 @@ export function BusinessDetail() {
             />
             <a
               className="discount-review-link"
+              onClick={() => {
+                if (viewerId)
+                  void recordBusinessEvent(business.id, 'official_click');
+              }}
               href={business.source_url}
               target="_blank"
               rel="noreferrer"

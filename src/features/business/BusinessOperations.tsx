@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client, errorFor } from '../../shared/auth/account';
 import { ActionForm } from '../auth/ActionForm';
+import { BusinessMenu, OwnedBusinessTools } from './BusinessManagement';
 import { BusinessPhotoEditor } from './BusinessPhoto';
 import { SchoolSelect } from '../auth/SchoolSelect';
 import { ReportList } from '../discounts/components/ReportList';
@@ -261,7 +262,10 @@ export function BusinessOperations({
         ) : status === undefined ? (
           <p role="status">매장 운영 권한을 확인하는 중입니다.</p>
         ) : owner ? (
-          <OperatorTools business={business} refresh={refresh} />
+          <>
+            <OperatorTools business={business} refresh={refresh} />
+            <OwnedBusinessTools id={business.id} />
+          </>
         ) : (
           <>
             {status && <p role="status">{labels[status]}</p>}
@@ -300,6 +304,7 @@ export function BusinessOperations({
             )}
           </>
         ))}
+      <BusinessMenu id={business.id} owner={owner} />
       <ReportList
         key={'coupons-' + revision}
         title="매장 쿠폰"

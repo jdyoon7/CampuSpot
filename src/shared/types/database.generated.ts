@@ -369,6 +369,168 @@ export type Database = {
           },
         ]
       }
+      discount_business_menu_items: {
+        Row: {
+          business_id: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          price_krw: number
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          price_krw: number
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          price_krw?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_business_menu_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_business_schedule_requests: {
+        Row: {
+          available_from: string | null
+          available_until: string | null
+          base_available_from: string | null
+          base_available_until: string | null
+          base_ends_on: string | null
+          base_starts_on: string | null
+          base_weekdays: number[] | null
+          business_id: string
+          created_at: string
+          decision: string
+          ends_on: string | null
+          id: string
+          note: string
+          offer_id: string
+          offer_name: string
+          requested_by: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          starts_on: string | null
+          weekdays: number[] | null
+        }
+        Insert: {
+          available_from?: string | null
+          available_until?: string | null
+          base_available_from?: string | null
+          base_available_until?: string | null
+          base_ends_on?: string | null
+          base_starts_on?: string | null
+          base_weekdays?: number[] | null
+          business_id: string
+          created_at?: string
+          decision?: string
+          ends_on?: string | null
+          id?: string
+          note: string
+          offer_id: string
+          offer_name: string
+          requested_by: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          starts_on?: string | null
+          weekdays?: number[] | null
+        }
+        Update: {
+          available_from?: string | null
+          available_until?: string | null
+          base_available_from?: string | null
+          base_available_until?: string | null
+          base_ends_on?: string | null
+          base_starts_on?: string | null
+          base_weekdays?: number[] | null
+          business_id?: string
+          created_at?: string
+          decision?: string
+          ends_on?: string | null
+          id?: string
+          note?: string
+          offer_id?: string
+          offer_name?: string
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          starts_on?: string | null
+          weekdays?: number[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_business_schedule_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_business_schedule_requests_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "discount_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_business_schedule_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_business_schedule_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_alert_preferences: {
+        Row: {
+          ending: boolean
+          new_offer: boolean
+          starting: boolean
+          user_id: string
+        }
+        Insert: {
+          ending?: boolean
+          new_offer?: boolean
+          starting?: boolean
+          user_id: string
+        }
+        Update: {
+          ending?: boolean
+          new_offer?: boolean
+          starting?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_alert_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campuses: {
         Row: {
           created_at: string
@@ -1234,6 +1396,75 @@ export type Database = {
           p_path: string | null
         }
         Returns: boolean
+      }
+      save_discount_menu_item: {
+        Args: {
+          p_business: string
+          p_description?: string
+          p_id?: string
+          p_name: string
+          p_price: number
+        }
+        Returns: string
+      }
+      remove_discount_menu_item: {
+        Args: { p_business: string; p_id: string }
+        Returns: undefined
+      }
+      record_discount_business_event: {
+        Args: { p_business: string; p_kind: string }
+        Returns: undefined
+      }
+      get_owned_discount_business_stats: {
+        Args: { p_business: string }
+        Returns: {
+          coupons_issued: number
+          coupons_redeemed: number
+          official_clicks_30d: number
+          views_30d: number
+        }[]
+      }
+      request_discount_schedule: {
+        Args: {
+          p_business: string
+          p_days?: number[]
+          p_end?: string
+          p_from?: string
+          p_note: string
+          p_offer: string
+          p_start?: string
+          p_until?: string
+        }
+        Returns: string
+      }
+      review_discount_schedule: {
+        Args: { p_approve: boolean; p_request: string }
+        Returns: undefined
+      }
+      list_owned_discount_schedules: {
+        Args: { p_business: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          available_from: string | null
+          available_until: string | null
+          ends_on: string | null
+          id: string
+          request_status: string | null
+          starts_on: string | null
+          store_name: string
+          weekdays: number[] | null
+        }[]
+      }
+      get_my_discount_alert_preferences: {
+        Args: never
+        Returns: {
+          ending: boolean
+          new_offer: boolean
+          starting: boolean
+        }[]
+      }
+      set_my_discount_alert_preferences: {
+        Args: { p_ending: boolean; p_new_offer: boolean; p_starting: boolean }
+        Returns: undefined
       }
       review_discount_report: {
         Args: {

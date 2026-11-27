@@ -415,3 +415,34 @@
   margin-block-end: 1rem;
   border-radius: 0.65rem;
 }
+
+.discount-store-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.65rem;
+  margin-block: 0.75rem;
+}
+
+.discount-store-metrics div {
+  padding: 0.65rem;
+  border: 1px solid #83978a;
+  border-radius: 0.45rem;
+}
+
+.discount-store-metrics dd {
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+
+.discount-correction .discount-schedule-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.discount-correction .discount-schedule-days label {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  min-height: 44px;
+}
