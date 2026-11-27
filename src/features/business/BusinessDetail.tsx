@@ -20,6 +20,7 @@ import {
 import { businessPath } from './BusinessDirectory';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { BusinessDiscovery } from './BusinessDiscovery';
+import { BusinessMapLink } from './BusinessMapLink';
 import { businessCategoryLabels } from './categories';
 
 function OfferPicker({
@@ -235,9 +236,20 @@ export function BusinessDetail() {
                 .join(' · ')}
             </p>
           )}
-          <a href={business.source_url} target="_blank" rel="noreferrer">
-            매장 공식 정보 보기
-          </a>
+          <div className="discount-utility-links">
+            <BusinessMapLink
+              address={business.address}
+              name={businessName(business)}
+            />
+            <a
+              className="discount-review-link"
+              href={business.source_url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              매장 공식 정보 보기
+            </a>
+          </div>
           <BusinessFollowButton businessId={business.id} />
           {state.status === 'ready' && canReview(state.account.roles) && (
             <BusinessDiscovery
