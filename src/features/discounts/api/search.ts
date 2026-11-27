@@ -3,10 +3,15 @@ import { AccountError, client } from '../../../shared/auth/account';
 import { pageSize } from './reports';
 import { businessCategory } from '../../business/categories';
 
+export const discountSort = z.enum(['recent', 'percent', 'amount', 'popular']);
+
 const searchInput = z.object({
   query: z.string().trim().max(100),
   todayOnly: z.boolean(),
   endingSoon: z.boolean(),
+  nowOnly: z.boolean().optional(),
+  partnerOnly: z.boolean().optional(),
+  sort: discountSort.optional(),
   university: z.uuid().optional(),
   region: z.string().trim().min(1).max(80).optional(),
   category: businessCategory.optional(),
@@ -19,9 +24,18 @@ export async function searchPublished(filters: SearchFilters, page: number) {
       'invalid_search',
       '검색어는 100자 이내로 입력해 주세요.',
     );
-  const { query, todayOnly, endingSoon, university, region, category } =
-    parsed.data;
-  const { data, error } = await client().rpc('search_discount_catalog', {
+  const {
+    query,
+    todayOnly,
+    endingSoon,
+    university,
+    region,
+    category,
+    nowOnly,
+    partnerOnly,
+    sort,
+  } = parsed.data;
+  const { data, error } = await client().rpc('search_discount_catalog_ranked', {
     p_query: query,
     p_today_only: todayOnly,
     p_ending_soon: endingSoon,
@@ -30,6 +44,9 @@ export async function searchPublished(filters: SearchFilters, page: number) {
     p_university_id: university,
     p_region: region,
     p_category: category,
+    p_now_only: nowOnly,
+    p_partner_only: partnerOnly,
+    p_sort: sort,
   });
   if (error)
     throw new AccountError(
