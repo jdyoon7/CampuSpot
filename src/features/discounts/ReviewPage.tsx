@@ -15,6 +15,7 @@ import {
   type Decision,
 } from './api/review';
 import { ReportList } from './components/ReportList';
+import { ReportPhoto } from './components/ReportPhoto';
 import { OfferDetails } from './components/OfferDetails';
 
 function ReviewActions({
@@ -149,6 +150,7 @@ function ReviewQueue({ userId }: { userId: string }) {
           <>
             <strong>{item.store_name}</strong>
             <OfferDetails offer={item} />
+            {item.photo && <ReportPhoto path={item.photo} />}
             <small>{formatKoreanDate(item.created_at)} 접수</small>
             <ReviewActions
               itemId={item.id}
