@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Bookmark, CalendarDays, MapPin, Store } from 'lucide-react';
+import {
+  Bell,
+  Bookmark,
+  CalendarDays,
+  MapPin,
+  Store,
+  Ticket,
+} from 'lucide-react';
 import { useAuth } from '../../shared/auth/useAuth';
+import { PromotedStores } from '../payments/PromotedStores';
 import { ReportForm } from './components/ReportForm';
 import { MyReports } from './components/MyReports';
 import { MyCorrections } from './components/MyCorrections';
@@ -25,6 +33,9 @@ export default function DiscountsPage() {
           </Link>
           <Link className="discount-calendar-link" to="/discounts/saved">
             <Bookmark size={18} aria-hidden="true" /> 저장한 혜택
+          </Link>
+          <Link className="discount-calendar-link" to="/discounts/coupons">
+            <Ticket size={18} aria-hidden="true" /> 내 쿠폰·포인트
           </Link>
           <Link className="discount-calendar-link" to="/discounts/map">
             <MapPin size={18} aria-hidden="true" /> 혜택 지도
@@ -63,9 +74,18 @@ export default function DiscountsPage() {
           제보 검수하기
         </Link>
       )}
+      {state.status !== 'unconfigured' && <PromotedStores />}
       {state.status !== 'unconfigured' && (
         <PublishedOffers
           userId={userId}
+          canEdit={state.status === 'ready' && canReview(state.account.roles)}
+          hasSchool={
+            state.status === 'ready' &&
+            Boolean(
+              state.account.verifiedUniversityId ??
+              state.account.profile.university_id,
+            )
+          }
           onCorrectionSaved={() => setCorrectionRevision((n) => n + 1)}
         />
       )}

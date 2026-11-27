@@ -422,3 +422,15 @@ verify_jwt = false
 [functions.discount-evidence]
 enabled = true
 verify_jwt = false
+
+[functions.discount-business-photo]
+enabled = true
+verify_jwt = false
+
+[functions.groble-checkout]
+enabled = true
+verify_jwt = false
+
+[functions.groble-webhook]
+enabled = true
+verify_jwt = false

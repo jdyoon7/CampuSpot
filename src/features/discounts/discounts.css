@@ -352,7 +352,7 @@
 }
 
 .discount-catalog-filters select,
-.discount-correction input {
+.discount-correction input:not([type='checkbox']) {
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -361,6 +361,26 @@
   border-radius: 0.45rem;
   background: Canvas;
   color: CanvasText;
+}
+
+.discount-search-filters select {
+  min-height: 44px;
+  padding: 0.4rem;
+  border: 1px solid #7a8e80;
+  border-radius: 0.45rem;
+  background: Canvas;
+  color: CanvasText;
+}
+
+.discount-correction label:has(input[type='checkbox']) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.discount-correction h3 {
+  margin-block: 1rem 0.45rem;
+  font-weight: 650;
 }
 
 .discount-evidence-image {
@@ -379,4 +399,50 @@
 .discount-history .discount-map-selected {
   outline: 2px solid #567e62;
   outline-offset: 0.35rem;
+}
+
+.discount-coupon-code {
+  display: block;
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+
+.discount-business-photo {
+  display: block;
+  inline-size: 100%;
+  max-block-size: 25rem;
+  object-fit: contain;
+  margin-block-end: 1rem;
+  border-radius: 0.65rem;
+}
+
+.discount-store-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.65rem;
+  margin-block: 0.75rem;
+}
+
+.discount-store-metrics div {
+  padding: 0.65rem;
+  border: 1px solid #83978a;
+  border-radius: 0.45rem;
+}
+
+.discount-store-metrics dd {
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+
+.discount-correction .discount-schedule-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.discount-correction .discount-schedule-days label {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  min-height: 44px;
 }

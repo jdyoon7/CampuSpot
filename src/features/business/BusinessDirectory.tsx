@@ -23,6 +23,14 @@ export function BusinessDirectory() {
           >
             관심 매장
           </Link>
+          {state.status === 'ready' && (
+            <Link
+              className="discount-calendar-link"
+              to={businessPath + '/management'}
+            >
+              내 운영 매장
+            </Link>
+          )}
           {state.status === 'ready' && canReview(state.account.roles) && (
             <Link className="discount-calendar-link" to={businessPath + '/new'}>
               매장·지점 등록

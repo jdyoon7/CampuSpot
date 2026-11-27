@@ -2,6 +2,12 @@ import { Route } from 'react-router-dom';
 import DiscountsPage from './DiscountsPage';
 import { ReviewPage } from './ReviewPage';
 import { CalendarPage } from './CalendarPage';
+import { DiscountWallet } from './DiscountWallet';
+import { GrobleReviewPage } from '../payments/GrobleReviewPage';
+import { BusinessDashboard } from '../business/BusinessDashboard';
+import { ScheduleReview } from '../business/ScheduleReview';
+import { PointReview } from './PointReview';
+import { OperatorReview } from '../business/OperatorReview';
 import { BookmarksPage } from './BookmarksPage';
 import {
   BusinessDirectory,
@@ -13,11 +19,20 @@ import { FollowedBusinessesPage } from '../business/FollowedBusinessesPage';
 import { BusinessAlertsPage } from '../notifications/BusinessAlertsPage';
 export const discountsRoutes = (
   <>
+    <Route path="/discounts/coupons" element={<DiscountWallet />} />
+    <Route path="/discounts/review/schedules" element={<ScheduleReview />} />
+    <Route path="/discounts/review/payments" element={<GrobleReviewPage />} />
+    <Route path="/discounts/review/points" element={<PointReview />} />
+    <Route path="/discounts/review/operators" element={<OperatorReview />} />
     <Route path="/discounts/map" element={<DiscountMapPage />} />
     <Route path="/discounts/review" element={<ReviewPage />} />
     <Route path="/discounts/calendar" element={<CalendarPage />} />
     <Route path="/discounts/saved" element={<BookmarksPage />} />
     <Route path="/discounts/business" element={<BusinessDirectory />} />
+    <Route
+      path="/discounts/business/management"
+      element={<BusinessDashboard />}
+    />
     <Route path="/discounts/business/new" element={<RegisterBusinessPage />} />
     <Route
       path="/discounts/business/following"

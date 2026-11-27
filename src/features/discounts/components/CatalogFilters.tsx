@@ -48,7 +48,7 @@ export function CatalogFilters({
         aria-label="혜택 검색 분류"
       >
         <label>
-          <span id={labelId + '-school'}>인근 학교</span>
+          <span id={labelId + '-school'}>학교</span>
           <select
             aria-labelledby={labelId + '-school'}
             value={value.university ?? ''}
